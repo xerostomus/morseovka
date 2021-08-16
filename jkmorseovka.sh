@@ -34,10 +34,9 @@ if [ "$(whereis sox | cut -d: -f2)" == "" ]||[ "$(whereis feh | cut -d: -f2)" ==
 	
 abeceda=( a b c d e f g h ch i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 " " ä ë ö ü "," "." ":" ";" "?" "!" "-" "/" "=" "_" "“" "<->" "@" ")" "("  )	# ch se samozrejme nevyhodnocuje
 abecedamorseova=( ".-" "-..." "-.-." "-.." "." "..-." "--." "...." "----" ".." ".---" "-.-" ".-.." "--" "-." "---" ".--." "--.-" ".-." "..." "-" "..-" "...-" ".--" "-..-"  "-.--" "--.." "-----" ".----" "..---" "...--" "...-" "....." "-...." "--..." "---.." "----." " " ".-.-" "..-.." "---." "..--" "--..--" ".-.-.-" "---..." "-.-.-." "..--.." "--...-" "-....-" "-..-." "-...-" "..--.-" ".-..-." ".----." ".--.-." "-.--.-" "-.--." )	
-	
 abecedaslovem=( "akát" "blýskavice" "cílovníci" "dálava" "erb" "Filipíny" "Grónská zem" "hrachovina" "chvátá k nám sám" "ibis" "jasmín bílý" "krákorá" "lupíneček" "mává" "národ" "ó náš pán" "papírníci" "qílí orkán" "rarášek" "sekera" "trám" "uličník" "vyučený" "wagón klád" "xénokratés" "ýgar mává" "známá žena" 0 1 2 3 4 5 6 7 8 9 "mezera" "a umlaut"  "e umlaut" "o umlaut" "u umlaut" "Čárka" "Tečka" "Dvojtečka" "Středník" "Otazník" "Vykřičník" "Pomlčka" "Lomítko" "Rovnítko" "Podtržítko" "Uvozovka" "Tabulátor" "Zavináč" "Kulatá závorka zavírací" "Kulatá závorka otevírací" )
-intestines=$(printf "%s\n" ${names[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ")
-# echo "declare -A abeceda_asociativni=( $(printf "%s\n" ${abeceda[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ") )"; exit # toto je radka, ktera vytvori tento retezec 
+# intestines=$(printf "%s\n" ${names[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ")
+# echo "declare -A abeceda_asociativni=( $(printf "%s\n" ${abeceda[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ") )"; exit # toto je radka, ktera vytvori nasledujici retezec 
 declare -A abeceda_asociativni=( [a]=1 [b]=2 [c]=3 [d]=4 [e]=5 [f]=6 [g]=7 [h]=8 [ch]=9 [i]=10 [j]=11 [k]=12 [l]=13 [m]=14 [n]=15 [o]=16 [p]=17 [q]=18 [r]=19 [s]=20 [t]=21 [u]=22 [v]=23 [w]=24 [x]=25 [y]=26 [z]=27 [0]=28 [1]=29 [2]=30 [3]=31 [4]=32 [5]=33 [6]=34 [7]=35 [8]=36 [9]=37 [ä]=38 [ë]=39 [ö]=40 [ü]=41 [,]=42 [.]=43 [:]=44 [;]=45 [?]=46 [!]=47 [-]=48 [/]=49 [=]=50 [_]=51 [“]=52 [<->]=53 ["@"]=54 [)]=55 [(]=56  )
 # echo ${abeceda_asociativni[-]} # OK funguje
 abeceda_statistika_chyby=( $(printf  '0 %.0s' $(seq 1 ${#abeceda[@]}))) # vytvori n-nul
@@ -132,7 +131,7 @@ mezirici
 read 
 
 column -t -s$'	' <<mezirici
-ZVLÁŠTNÍ SIGNÁL 	KÓD
+ZVLÁŠTNÍ SIGNÁL	KÓD
 Začátek vysílání	/-.-.-.-./
 Konec vysílání	/...-.-/
 Rozumím	/----.-/
@@ -828,27 +827,24 @@ function Fprocvicovani { # $1 textlatinkou
      for arg in "$@"; do
          shift
          case "$arg" in
-			--pismena)      	set -- "$@" '-p' ;;
-			--vypis-znaku)		set -- "$@" '-v' ;;
-            --pismena-vizualne) set -- "$@" '-P' ;; #
-            --cviceni)     		set -- "$@" '-c' ;;
-            --pocet-pismen)     set -- "$@" '-x' ;;
-            --diktat)      		set -- "$@" '-d' ;;
-            --opis)				set -- "$@" '-o' ;;
-            --morse)      		set -- "$@" '-m' ;;
-            --latinka)     		set -- "$@" '-l' ;;
-            --rychlost)    		set -- "$@" '-r' ;;
-            --mezi-znaky)    	set -- "$@" '-R' ;;
-            --statistika)    	set -- "$@" '-s' ;;
-            --help)    			set -- "$@" '-h' ;;
-#             --)      set -- "$@" '-' ;;
-#             --)      set -- "$@" '-' ;;
+		--pismena)      	set -- "$@" '-p' ;;
+		--vypis-znaku)		set -- "$@" '-v' ;;
+        	--pismena-vizualne) 	set -- "$@" '-P' ;; #
+     		--cviceni)     		set -- "$@" '-c' ;;
+         	--pocet-pismen)     	set -- "$@" '-x' ;;
+            	--diktat)      		set -- "$@" '-d' ;;
+            	--opis)			set -- "$@" '-o' ;;
+            	--morse)      		set -- "$@" '-m' ;;
+            	--latinka)     		set -- "$@" '-l' ;;
+            	--rychlost)    		set -- "$@" '-r' ;;
+            	--mezi-znaky)    	set -- "$@" '-R' ;;
+            	--statistika)    	set -- "$@" '-s' ;;
+            	--help)    		set -- "$@" '-h' ;;
 #             --)      set -- "$@" '-' ;;
             *)          set -- "$@" "$arg"
          esac
      done
     
-#     while getopts 'lnOhm:o:s:' opt; do
     while getopts 'vhdsp:P:c:x:o:m:l:r:R:' opt     2> /dev/null ; do
         case $opt in
             # Long options
@@ -1017,51 +1013,4 @@ elif $mFlag; then
 	echo -e "\tZvukový soubor: $zvukovy_soubor" >&2
 	exit
 	fi
-	
-exit # odpad
-	function Fpismena_old {
-	pokusu=0
-	spravne=0
-	delka_vyber=${#Gvyber}
-	REPLY=""
-	pismeno_morse=""
-	pismeno_slovem=""
-	echo "Nápověda: quit, exit, help, ?"
-	echo 
-	date +%Y-%m-%d_%H-%M-%S >> jkmorseovka$(date +%Y-%m-%d).log
-
-	while [ "$REPLY" != ";" ]	
-		do 
-		REPLY=""
-		nahodile_pismeno=$(( $RANDOM % $delka_vyber ))
-# 		echo "delka_vyber($delka_vyber) nahodile_pismeno($nahodile_pismeno)"
-		pismeno=${Gvyber:nahodile_pismeno:1}
-# 		echo "nahodile_pismeno: $nahodile_pismeno $pismeno (Gvyber $Gvyber)"
-		pismeno_morse=$(Fpismeno_do_morse $pismeno)
-		pismeno_slovem=$(Fpismeno_do_slov $pismeno)
-		chybil=0
-		while [ "$REPLY" != "$pismeno" ]
-			do
-			[ $chybil -lt 1 ] && ((pokusu++)) # navysi pocet pokusu u noveho pismena
-			Fmorseovka_hrani $pismeno_morse $pismena_vizualne
-			[ "$pismena_vizualne" == " " ] && echo $pismeno_morse 
-			read -p "Pismeno? "
-			if [ "$REPLY" == "quit" ]||[ "$REPLY" == "exit" ]||[ "$REPLY" == ";" ]; then 
-				echo -n " $spravne/$pokusu=$(( 100*spravne/pokusu ))%" >> jkmorseovka$(date +%Y-%m-%d).log 
-				exit 
-			elif [ $chybil -gt 1  ]||[ "$REPLY" == "?" ]||[ "$REPLY" == "help" ]||[ "$REPLY" == "," ]; then echo; echo "Je to pismeno: $pismeno $pismeno_morse $pismeno_slovem"; 
-				((chybil++))
-			elif [ "$REPLY" == "$pismeno" ]; then 
-				[ $chybil == 0 ] && ((spravne++))
-				echo "Ano, spravne: $pismeno $pismeno_morse $pismeno_slovem	(spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)"
-				echo "$(date +%Y-%m-%d_%H-%M-%S) $pismeno 1" >> jkmorseovka$(date +%Y-%m-%d).log
-				chybil=0
-			else 
-				echo "Chyba! Napoveda(?|help). Konec(;|exit|quit). spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%" 
-				((chybil++))
-				echo "$(date +%Y-%m-%d_%H-%M-%S) $pismeno 0" >> jkmorseovka$(date +%Y-%m-%d).log
- 			fi
- 			echo 
-		done
-	done
-	}
+exit
