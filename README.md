@@ -1,5 +1,5 @@
 # morseovka
-Program to learn morse code written in Bash
+Program to learn morse code written in Bash - in Czech langugage
 
 At the time present it is written in Czech language as it is intended for my children and their friend. Occasionally I will translate it into English - if anybody is interested. 
 
