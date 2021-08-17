@@ -1,4 +1,7 @@
 #!/bin/bash
+ 
+# smazal jsem sort2
+
 
 # TODO vypisy obrazovek: nohup jkmorseovka.sh -h | tee vystup.out
 # TODO dat vystup do prikazu column
@@ -200,7 +203,7 @@ function Fusage_old {
 		echo
 		echo "--cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni"
 		echo "$nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky"
-		echo "$nazev_programu --c cviceni4 --mezi-znaky 1000 --pocet_pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy"
+		echo "$nazev_programu -c cviceni4 --mezi-znaky 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy"
 		echo
 		echo "$nazev_programu --diktat # nadiktujte si vlastni text morseovkou"
 		echo "--diktat - vysilani vlastniho textu"
@@ -506,7 +509,7 @@ function Fpismena {
 	REPLY=""
 	pismeno_morse=""
 	pismeno_slovem=""
-	echo "Nápověda: ?;"
+	echo "Nápověda: Středník ; ukončuje cvičení"
 	echo 
 	date +%Y-%m-%d_%H-%M-%S >> jkmorseovka$(date +%Y-%m-%d).log
 	s=0
@@ -536,12 +539,22 @@ function Fpismena {
 				echo -e "	(spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)	v=$(( (6000*$s / $sekund ) / 100 )) zn/min\t$(( $sekund / $s )) s/zn"
 				echo " $spravne/$pokusu=$(( 100*spravne/pokusu ))% v=$(( (6000*$s / $sekund ) / 100 )) z/min $(( $sekund / $s )) sekund/znak" >> jkmorseovka$(date +%Y-%m-%d).log 
 					{
-					for i in $(seq	0 ${#abeceda[@]})
-					do 
-					echo  "${abeceda[$i]} ${abeceda_statistika_chyby[$i]}/${abeceda_statistika_pokusy[$i]} ${abeceda_statistika_sekundy[$i]}/${abeceda_statistika_pokusy[$i]}"
-					done	
+					echo 
+					echo Statistika
+					echo
+						{
+						for i in $(seq	0 $(( ${#abeceda[@]} - 1 )) )
+							do 
+							
+							[ "${abeceda_statistika_pokusy[$i]}" != "0"  ] && echo  "${abeceda[$i]} ${abeceda_statistika_chyby[$i]}/${abeceda_statistika_pokusy[$i]}=$(bc -l <<<"scale=3;${abeceda_statistika_chyby[$i]}/${abeceda_statistika_pokusy[$i]}") ${abeceda_statistika_sekundy[$i]}/${abeceda_statistika_pokusy[$i]}=$(bc -l <<<"scale=3; ${abeceda_statistika_sekundy[$i]}/${abeceda_statistika_pokusy[$i]}")"
+							done
+						echo
+						} |sort  --field-separator="=" -k3 > /dev/shm/jkmorseovka_statistika.tmp # --reverse
 					}
-					
+					cat /dev/shm/jkmorseovka_statistika.tmp
+					sed "s/^\(.\).*/\1/" /dev/shm/jkmorseovka_statistika.tmp | tr -d "\n" 
+					echo 
+					echo 
 				exit 
 			elif [ "$REPLY" == "$pismeno" ]; then 
 				sekund=$(( $(date "+%s") - $start ))
@@ -755,7 +768,7 @@ function Fopisovani {
 			echo
 			cely_text_latinkou=""
 		fi
-		read -N1 -e -p "Vyzkouset jeste jednou? (p - prerat znovu) [Y/n/p] "
+		read -N1 -e -p "Vyzkouset jeste jednou? (p - prehrat znovu) [Y/n/p] "
 		done 
 	}		
 function Fprocvicovani { # $1 textlatinkou
@@ -766,6 +779,8 @@ function Fprocvicovani { # $1 textlatinkou
 	echo
 # 	REPLY="y"
 	i=1
+	s=0 # pocet opsanych pismen
+	start=$(date "+%s") # start programu
 	while true; do # [ "$REPLY" == "y" ];do
 		morse=$(Flatinka_do_morse $latinka)
 # 		echo "morse($morse) latinka($latinka)"
@@ -776,8 +791,10 @@ function Fprocvicovani { # $1 textlatinkou
 		elif [ "$odpoved" == "?" ]; then 
 			echo Mělo by to být: $latinka;
 		elif [ "$odpoved" == "$latinka" ];then	
-			echo -e "\tSpravne na $i. pokus. Zadani: $latinka $morse"
-			echo "$(date +%Y-%m-%d_%H-%M-%S) $latinka $i" >> jkmorseovka$(date +%Y-%m-%d).log
+			sekund=$(( $(date "+%s") - $start ))
+			s=$(( Gpocet_pismen_cviceni + s )) # celkem pismen
+			echo -e "\tSpravne na $i. pokus. Zadani: $latinka $morse	Rychlost: $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" 
+			echo "$(date +%Y-%m-%d_%H-%M-%S) $latinka $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
 			Fcviceni # vytvori novy nahodily retezec v Gcviceni_text
 			latinka=$Gcviceni_text
 			i=0
