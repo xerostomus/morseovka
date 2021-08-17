@@ -1,0 +1,66 @@
+Program na výuku morseovky
+--------------------------
+
+PhDr. Mgr. Jeroným Klimeš, Ph.D. 2021-08-17
+jeronym.klimes@seznam.cz
+www.klimes.us
+
+Příběh na začátku
+
+Tento program vznikl zcela neplánovaně. Byl u nás na návštěvě syn ženiny kamarádky a nějak z něho vylezlo, že se učí morseovku. Řekl jsem si, že to nemůže být nic složitého, a že by si to mohli kluci zkusit naprogramovat v Bash - Linux. Ukázalo se, že to je mnohem složitější počin, než se prve zdálo. Už teď má ten program přes 1000 řádek.
+
+Samozřejmě kdybych se rozhodoval napsat ten program od začátku, tak bych asi raději sáhl po Pythonu, nebo C, protože psát to v Bash je trochu zhůvěřilost. Ale když už to mám takto napsané, tak to předělávat nebudu. Bash je šílená zmatlanina historických reliktů, nedodělků a provizorních řešení, takže v něm programovat je trochu alchymie.
+
+Co se ale tak nějak samo podařilo bylo naprogramování jádra programu, který generuje samotné zvuky. Nakonec to neskládám z teček a čárek, ale napřed vytvořím jakýsi "skript" z parametrů a pomocí něho program sox vytvořím zvukový soubor. Ten se pak přehrává, takže zvuk je hezky vyhlazený, pravidelný, jako by to sázel profesionální radista. To je myslím největší přednost tohoto programu.
+
+Vlastní výuka Morseovy abecedy
+
+Vlastní výuka je zároveň seznámení s terminálem Linuxu a s příkazovou řádkou. 
+
+Program si stáhneme z GitHub úložiště jako dva soubory - shell script a obrázek znaků:
+
+jkmorseovka.sh 
+jkmorseovka.png
+
+Napřed musíme nastavit spustitelnost scriptu:
+
+chmod +x jkmorseovka.sh
+
+Načež ho můžeme spustit a vyzkoušet, co z něj vypadne, tak vyzkousime:
+
+./jkmorseovka.sh  # nebo 
+jkmorseovka.sh 
+
+Program si napřed vyžádá instalaci pomocných programů: sox (výroba zvuků), bc (kalkulačka), feh (zobrazování obrázku). Dále napoví, že vyžaduje nějaké parametry: 
+
+jkmorseovka.sh --help
+
+Nápověda se ukončuje písmenem q - quit a je v ní napsán celý postup, jak se morseovku učíme. 
+
+jkmorseovka.sh --vypis_znaku
+
+Napřed se zcela povrchně seznámíme s mnemotechnickými frázemi, které napovídají morse znak, např. Kákorá -.-. Po ukončení nápovědy se zobrazí obrázek s tabulkou, která se čte vždy od shora dolu s tím, že černý proužek je čárka, bílý tečka. Takže když sestupujeme odshora k písmenu K, tak máme černá - bílá - černá, čili "-.-". 
+
+Druhým krokem se nácvik po písmenech:
+
+jkmorseovka.sh --pismena-vizualne cviceni1 
+Cviceni1 jsou jednoznakova pismene, čili E a T, která se vizuálně zobrazují, když se přehrávájí. To je dobré pro začátek, ale pak přecházíme na cvičení bez zrakové opory: 
+
+jkmorseovka.sh --pismena cviceni12 
+Toto cvičí písmena už jen sluchem, každopádně po třech chybách se objeví nápověda. 
+
+Začátečníky překvapuje informace, že vůbec není důležité, jestli si pamatují či nepamatují jednotlivé znaky, takže si mohou kdykoli říkat o nápovědu bez většího volního úsilí. Totiž učení morseovky není test inteligence či paměti. Tam necvičíme racionální savčí mozek či sílu vůle, ale je to drilování plazího mozku, aby se vytvořilo reflexní spojení mezi zvukem -.- a okamžitým stiskem klávesy K. Než toto reflexní spojení samo vznikne, tak se musí ten úkon zopakovat tisíckrát po dobu několika měsíců. Takže je jasné, že mezi tím byste se naučili racionálním savčím mozkem mnemotechnické zkratky stokrát, proto nás opravdu netrápí, že je na začátku dítě pořádně neumí. Naopak je důležité vědět, že ve stresu přestává fungovat paměť, tedy děti rozhodně netlačíme do stresu - tempo by mělo být tak pomalé, aby se v klidu správně rozpomněly na 80-90 % písmen. Nevadí, když se při pomalém tempu trochu nudí, v této "nudné mezidobě" totiž vzniká žádoucí reflexní spojení zvuk-pohyb prstu. Tedy jako u klavíru platí, čím pomaleji hraji, tím rychleji se učím. Je to jako s rozbruskou - čím méně tlačím na tenký řezný kotouč, tím rychleji řeže. Čím méně se snažím zvládnout partnerský rozchod silou vůle, tím dříve ho mám za sebou. Čím méně se snažím usnout, tím snadněji usnu. To vše jsou příklady paradoxů, které často lidem nedocházejí.
+
+V nevýhodě jsou děti s ADHD, které při morseovce trápí zárazy - mnohem hůř vytvářejí stabilní reflexní spojení:
+	Zvuk --> Pohyb prstu
+Díky tomu mohou být později kreativnější a vynalézavější. Bohužel podmínkou nutnou kreativity je naučit se, přesněji řečeno nadrilovat se předem základy řemesla, což je pro ADHD děti utrpením. Ale holt takový je život. Nic není zadarmo. 
+
+Zpět ale k morseovce. Určování písmen střídáme nejprve s opisováním:
+jkmorseovka.sh --opis "Pepa Smolik" # vyzaduje presny opis tohoto textu
+
+U cviceni prakticky vzdy nastavujeme vetsi pauzu mezi pismeny než je normovaná (1000 místo 100), ale by nevznikal časový stres. 
+jkmorseovka.sh -o cviceni3a --mezi-pismeny 1000 --pocet-pismen 3 
+
+
+
+

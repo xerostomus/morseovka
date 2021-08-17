@@ -181,7 +181,6 @@ function Fusage_old {
 		echo -e "\tKratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)"
 		echo
 		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
-# 		echo "$nazev_programu {-v|--vypis_znaku|-p|--pismena|-pv|--pismena_vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-x|--pocet_pismen} {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
 		echo
 		echo Postup uceni a vysvetleni jednotlivych znaku
 		echo
@@ -199,7 +198,7 @@ function Fusage_old {
 		echo
 		echo "--opis - opisovani zadaneho textu do morse pomoci klaves .- a enter (mezera)"
 		echo "$nazev_programu --opis "Pepa Smolik" # vyzaduje presny opis tohoto textu"
-		echo "$nazev_programu -o cviceni1234 # vytvori nahodnou kominaci beznych pismen"
+		echo "$nazev_programu -o cviceni1234 # vytvori nahodnou kombinaci beznych pismen"
 		echo
 		echo "--cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni"
 		echo "$nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky"
@@ -217,7 +216,7 @@ function Fusage_old {
 		echo Volitelne parametry
 		echo "--rychlost - pocet pismen na cviceni (výchozí: 120)"
 		echo "--mezi-pismeny - navyšení pauzy mezi znaky a slovy (v: 100)"
-		echo "--znaku-cviceni - pocet znaku ve cviceni (v: 2)"
+		echo "--pocet-pismen - pocet znaku ve cviceni (v: 2)"
 		echo "Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu."
 		echo
 		echo "Zvukový soubor prave hraneho zvuku: $zvukovy_soubor"
@@ -271,7 +270,7 @@ $nazev_programu -o cviceni1234 # vytvori nahodnou kominaci beznych pismen
 
 --cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni
 $nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky
-$nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet_pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy
+$nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy
 
 --diktat - vysilani vlastniho textu
 $nazev_programu --diktat # nadiktujte si vlastni text morseovkou
@@ -552,9 +551,13 @@ function Fpismena {
 						} |sort  --field-separator="=" -k3 > /dev/shm/jkmorseovka_statistika.tmp # --reverse
 					}
 					cat /dev/shm/jkmorseovka_statistika.tmp
-					sed "s/^\(.\).*/\1/" /dev/shm/jkmorseovka_statistika.tmp | tr -d "\n" 
+					posledni_mohykani=$(sed "s/^\(.\).*/\1/" /dev/shm/jkmorseovka_statistika.tmp | tr -d "\n" )
+					echo $posledni_mohykani
 					echo 
+					echo Z těchto znaků si vězměte nejpomalejších posledních pět a důkladně je procvičte, např:
+					echo "jkmorseovka.sh --cviceni ${posledni_mohykani: -5} --mezi-pismeny 1000 --pocet-pismen 4" 
 					echo 
+					
 				exit 
 			elif [ "$REPLY" == "$pismeno" ]; then 
 				sekund=$(( $(date "+%s") - $start ))
@@ -808,15 +811,6 @@ function Fprocvicovani { # $1 textlatinkou
 	done 
 	}	
 
-# echo
-# align_left 20 "karel"
-# echo
-# align_center 20 "karel"
-# echo
-# align_right 20 "karel"
-# echo
-# exit
-	
 # --- toto je main procedura --------------------------------
 # ---function Fprikazova_radka {
 
