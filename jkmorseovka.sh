@@ -180,7 +180,7 @@ function Fusage_old {
 		echo -e "\tParametry v [] jsou volitelne." 
 		echo -e "\tKratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)"
 		echo
-		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-znaky číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
+		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
 # 		echo "$nazev_programu {-v|--vypis_znaku|-p|--pismena|-pv|--pismena_vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-x|--pocet_pismen} {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
 		echo
 		echo Postup uceni a vysvetleni jednotlivych znaku
@@ -203,7 +203,7 @@ function Fusage_old {
 		echo
 		echo "--cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni"
 		echo "$nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky"
-		echo "$nazev_programu -c cviceni4 --mezi-znaky 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy"
+		echo "$nazev_programu -c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy"
 		echo
 		echo "$nazev_programu --diktat # nadiktujte si vlastni text morseovkou"
 		echo "--diktat - vysilani vlastniho textu"
@@ -216,7 +216,7 @@ function Fusage_old {
 		echo
 		echo Volitelne parametry
 		echo "--rychlost - pocet pismen na cviceni (výchozí: 120)"
-		echo "--mezi-znaky - navyšení pauzy mezi znaky a slovy (v: 100)"
+		echo "--mezi-pismeny - navyšení pauzy mezi znaky a slovy (v: 100)"
 		echo "--znaku-cviceni - pocet znaku ve cviceni (v: 2)"
 		echo "Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu."
 		echo
@@ -247,7 +247,7 @@ Pouziti:
 	Parametry v [] jsou volitelne. 
 	Kratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)
 
-$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-znaky číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} 
+$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} 
 
 Postup uceni a vysvetleni jednotlivych znaku
 
@@ -271,7 +271,7 @@ $nazev_programu -o cviceni1234 # vytvori nahodnou kominaci beznych pismen
 
 --cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni
 $nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky
-$nazev_programu --c cviceni4 --mezi-znaky 1000 --pocet_pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy
+$nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet_pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy
 
 --diktat - vysilani vlastniho textu
 $nazev_programu --diktat # nadiktujte si vlastni text morseovkou
@@ -284,7 +284,7 @@ $nazev_programu --latinka "/.../.-/--/.-// nebo |...-|---|-..|.-|"
 
 Volitelne parametry
 --rychlost <cislo mezi 50 a 300> - pocet pismen na cviceni (výchozí: 120)
---mezi-znaky <cislo mezi 100 az 1000> - navyšení pauzy mezi znaky a slovy (v: 100)
+--mezi-pismeny <cislo mezi 100 az 1000> - navyšení pauzy mezi znaky a slovy (v: 100)
 --znaku-cviceni <cislo mezi 2 az 20>- pocet znaku ve cviceni (v: 2)
 Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu.
 
@@ -854,7 +854,7 @@ function Fprocvicovani { # $1 textlatinkou
             	--morse)      		set -- "$@" '-m' ;;
             	--latinka)     		set -- "$@" '-l' ;;
             	--rychlost)    		set -- "$@" '-r' ;;
-            	--mezi-znaky)    	set -- "$@" '-R' ;;
+            	--mezi-pismeny)    	set -- "$@" '-R' ;;
             	--statistika)    	set -- "$@" '-s' ;;
             	--help)    		set -- "$@" '-h' ;;
 #             --)      set -- "$@" '-' ;;
