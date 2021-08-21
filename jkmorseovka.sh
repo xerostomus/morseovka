@@ -744,34 +744,38 @@ function Fmorse_input	{ # $1 pocet znaku (0=neomezene) $2 ":" vypina vypis; $3 "
 function Fopisovani {
 # 	[ $nasel ] && opis_text="$Gcviceni_text" || opis_text="$Gtext"
 	REPLY="y"
+	Fcviceni
+	Gpocet_pismen_opisovani=${#Gcviceni_text}
 	while [ "$REPLY" == "y" ]||[ "$REPLY" == "" ]||[ "$REPLY" == "$(echo -e -n "\x0d")" ]||[ "$REPLY" == "p" ];do
 		if [ "$REPLY" == "p" ]; then 
 			Flatinka_do_morse "$Gcviceni_text"
 			echo
 			play "$zvukovy_soubor" &> /dev/null
 		else	
-			Gcviceni_text=""
-			Fcviceni
 			echo
 			echo "Opiste tento text v morseovce: "
 			echo "                                $Gcviceni_text"
 			echo
 			echo -n "|"
-			Gpocet_pismen_opisovani=${#Gcviceni_text}
 			cely_text_latinkou=$(Fmorse_input $Gpocet_pismen_opisovani $' ' $' ' ":")
 			# 		Fdiktat : # :potlacuje graficky vystup
 			echo
+				morse=$(Flatinka_do_morse "$Gcviceni_text")
+# 				morse=$(Flatinka_do_morse "$Gcviceni_text")
 			if [ " $Gcviceni_text " == "$cely_text_latinkou"  ]; then 
 				echo "	Shoda: $Gcviceni_text ==$cely_text_latinkou"
+				Fmorseovka_hrani "$morse"
+				Fcviceni
+# 				Gcviceni_text=""
 			else
-				echo "	Neshoda: $Gcviceni_text !=$cely_text_latinkou"
+				echo "	Neshoda: $Gcviceni_text !=$cely_text_latinkou" 
+				echo "		Spravne: $morse"
+				Fmorseovka_hrani "$morse"
 			fi 
-			morse=$(Flatinka_do_morse "$Gcviceni_text")
-			Fmorseovka_hrani "$morse"
 			echo
 			cely_text_latinkou=""
 		fi
-		read -N1 -e -p "Vyzkouset jeste jednou? (p - prehrat znovu) [Y/n/p] "
+		read -N1 -e -p "Vyzkouset jeste jednou? (p - prehrat znovu. Konec ;) [Y/n/p] "
 		done 
 	}		
 function Fprocvicovani { # $1 textlatinkou
