@@ -8,18 +8,19 @@
 # TODO pismena neopakuji do omrzeni spatne pismeno
 # TODO 
 
+adresar=/dev/shm
 zvukovy_soubor="jkmorseovka.ogg" # toto uklada do aktualniho adresare, ale je to pomalejsi
-zvukovy_soubor="/dev/shm/jkmorseovka.ogg" # uklada do shared memory virtualniho disku v RAM pameti pocitace - je to velmi rychle, ale po vypnuti pocitace se to maze.
+zvukovy_soubor="$adresar/jkmorseovka.ogg" # uklada do shared memory virtualniho disku v RAM pameti pocitace - je to velmi rychle, ale po vypnuti pocitace se to maze.
 Gpocet_pismen_cviceni=5 # nahodile cviceni jede po 5 pismenech
 Gpocet_pismen_opisovani=5 # pouze u cviceni, jinak opisuje cely zadany text
 Gpocet_pismen_cviceni=2 # nahodile cviceni jede po 5 pismenech
 
 debug=":" #nebo " "
-Grychlost=100 # 120 strední
-Grychlost=50 # 120 strední
-Grychlost=150 # 120 strední
-Grychlost=120 # 120 strední - vychozi
-Gmezi_znaky=100 # 100 strední
+# Grychlost=100 # 120 strední
+# Grychlost=50 # 120 strední
+# Grychlost=150 # 120 strední
+Grychlost=150 # 150 strední - vychozi
+Gmezi_znaky=100 # 100 strední/normovana
 
 # globalni promenne krome logickych promennych
 # 	Gtext - zadani z prikazove radky, napr cviceni123
@@ -36,7 +37,7 @@ if [ "$(whereis sox | cut -d: -f2)" == "" ]||[ "$(whereis feh | cut -d: -f2)" ==
 	fi
 	
 abeceda=( a b c d e f g h ch i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 " " ä ë ö ü "," "." ":" ";" "?" "!" "-" "/" "=" "_" "“" "<->" "@" ")" "("  )	# ch se samozrejme nevyhodnocuje
-abecedamorseova=( ".-" "-..." "-.-." "-.." "." "..-." "--." "...." "----" ".." ".---" "-.-" ".-.." "--" "-." "---" ".--." "--.-" ".-." "..." "-" "..-" "...-" ".--" "-..-"  "-.--" "--.." "-----" ".----" "..---" "...--" "...-" "....." "-...." "--..." "---.." "----." " " ".-.-" "..-.." "---." "..--" "--..--" ".-.-.-" "---..." "-.-.-." "..--.." "--...-" "-....-" "-..-." "-...-" "..--.-" ".-..-." ".----." ".--.-." "-.--.-" "-.--." )	
+abecedamorseova=( ".-" "-..." "-.-." "-.." "." "..-." "--." "...." "----" ".." ".---" "-.-" ".-.." "--" "-." "---" ".--." "--.-" ".-." "..." "-" "..-" "...-" ".--" "-..-"  "-.--" "--.." "-----" ".----" "..---" "...--" "....-" "....." "-...." "--..." "---.." "----." " " ".-.-" "..-.." "---." "..--" "--..--" ".-.-.-" "---..." "-.-.-." "..--.." "--...-" "-....-" "-..-." "-...-" "..--.-" ".-..-." ".----." ".--.-." "-.--.-" "-.--." )	
 abecedaslovem=( "akát" "blýskavice" "cílovníci" "dálava" "erb" "Filipíny" "Grónská zem" "hrachovina" "chvátá k nám sám" "ibis" "jasmín bílý" "krákorá" "lupíneček" "mává" "národ" "ó náš pán" "papírníci" "qílí orkán" "rarášek" "sekera" "trám" "uličník" "vyučený" "wagón klád" "xénokratés" "ýgar mává" "známá žena" 0 1 2 3 4 5 6 7 8 9 "mezera" "a umlaut"  "e umlaut" "o umlaut" "u umlaut" "Čárka" "Tečka" "Dvojtečka" "Středník" "Otazník" "Vykřičník" "Pomlčka" "Lomítko" "Rovnítko" "Podtržítko" "Uvozovka" "Tabulátor" "Zavináč" "Kulatá závorka zavírací" "Kulatá závorka otevírací" )
 # intestines=$(printf "%s\n" ${names[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ")
 # echo "declare -A abeceda_asociativni=( $(printf "%s\n" ${abeceda[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ") )"; exit # toto je radka, ktera vytvori nasledujici retezec 
@@ -145,31 +146,56 @@ Omyl	/././././././
 Opakuji	/../../../../../../
 SOS, Pomoc	/.../---/.../
 mezirici
-echo; echo Prevzato z http://morseovaabeceda.cz/
+echo
+echo "Převzato z http://morseovaabeceda.cz/ a https://morsecode.world"
 	}	
 function Fnastaveni_rychlosti { #$1 Grychlost 50 - 150
 # 	Grychlost=$1
-	tecka_trvani=$(bc -l <<<"scale=3;10/$Grychlost") # je-li Grychlost 100, pak tecka trva 100ms
+	tecka_trvani=$(bc -l <<<"scale=3;10/$Grychlost") # je-li Grychlost 100, pak tecka cili unit trva 100ms, 
+	units_per_minute=$(bc -l <<<"scale=3;6*$Grychlost") # 60/10*$Grychlost
+	words_per_minute=$(bc -l <<<"scale=3;6*$Grychlost/50") # 60*10/50/$Grychlost
 	carka_trvani=$(bc -l <<<"scale=3;3*$tecka_trvani")
-	pauza_tecka_carka=$(bc -l <<<"scale=3;$tecka_trvani / 2") # dobre, ale pomerne rychle
- 	pauza_tecka_carka=$tecka_trvani 
+# 	pauza_tecka_carka=$(bc -l <<<"scale=3;$tecka_trvani / 2") # dobre, ale pomerne rychle
+ 	pauza_tecka_carka=$tecka_trvani # standard
 	pauza_pismeno=$(bc -l <<<"scale=3;$carka_trvani*$Gmezi_znaky/100") #$carka_trvani
 	pauza_slovo=$(bc -l <<<"scale=3;7*$tecka_trvani*$Gmezi_znaky/100")
-	nota=E4
-	nota=E6
+	nota=E4 # 330 Hz 
+	nota=E6 # 1397 Hz
+	nota=G5 # 784 Hz -standard
+ 
 	# Každé písmeno by mělo být odděleno pauzami stejné délky jako pomlčka (tj. Třikrát delší než zvuk tečky). Každé slovo by mělo být obklopeno pauzami, délka pauz by měla být přibližně 7krát delší než bod. Čím lépe si procvičíte pauzu, tím snazší bude porozumět vašemu kódu.
-	# tento navod neupravuje pauzu mezi teckami carkami, pouzivam trvani tecky ci jeho polovinu. 
+#     Dit: 1 unit
+#     Dah: 3 units
+#     Intra-character space (the gap between dits and dahs within a character): 1 unit
+#     Inter-character space (the gap between the characters of a word): 3 units
+#     Word space (the gap between two words): 7 units
+# https://morsecode.world/international/timing.html
+# The neat thing about "PARIS " is that it's a nice even 50 units long. It translates to ".--. .- .-. .. .../" so there are:
+#     10 dits: 10 units;
+#     4 dahs: 12 units;
+#     9 intra-character spaces: 9 units;
+#     4 inter-character spaces: 12 units;
+#     1 word space: 7 units.
+# A grand total of 10+12+9+12+7=50 units
+# 20 words per minute (or "20 wpm")	znamená 20x "Paris ", tzn. 20*50units, tzn. 100 units. 
+# tecka
 	}
 function Fvypis_konstant {
+echo -e	"Nastavení parametrů:"
 column -t -s$'	' <<mezirici
-Trvani tecky [s]: $tecka_trvani
-Trvani carky [s]: $carka_trvani
-Pauza mezi teckou a carkou [s]: $pauza_tecka_carka
-Pauza mezi pismeny [s]: $pauza_pismeno
-Pauza mezi slovy [s]: $pauza_slovo
-Hraná nota: $nota
+     Trvávání tečky (jednotka/unit) [s]: $tecka_trvani
+     Trvání čárky [s]: $carka_trvani
+     Pauza mezi tečkou a čárkou [s]: $pauza_tecka_carka
+     Pauza mezi písmeny [s]: $pauza_pismeno
+     Pauza mezi slovy [s]: $pauza_slovo
+     Hraná nota: $nota
+     Jednotky za minutu [upm - units per minute]:	$units_per_minute
+     Slov "Paříž " za minutu [wpm - words per minute]:	$words_per_minute
 mezirici
-	echo -e	"\tParametry jsou nastaveny podle tohoto návodu: \n\"Každé písmeno by mělo být odděleno pauzami stejné délky jako pomlčka, tj. třikrát delší než zvuk tečky. \nKaždé slovo by mělo být obklopeno pauzami. Délka pauz by měla být přibližně sedmkrát delší než bod. \nČím lépe si procvičíte pauzu, tím snazší bude porozumět vašemu kódu.\" \nPauza mezi teckami a carkami je nastavena na trvani tecky ci jeho polovinu."
+    echo
+	echo -e	"Každé písmeno je odděleno pauzami stejné délky jako čárka, tj. třikrát delší než zvuk tečky (jednotka či unit). \nKaždé slovo je odděleno pauzami, jež jsou sedmkrát delší než tečka. 
+	\nPauza mezi teckami a čárkami má trvaní tečky. 
+	\nObvyklá, leč nezávazná frekvence tónu je 800 Hz, tedy přibližně nota G5 MIDI, nebo G'' (784 Hz)"
 	}
 function Fusage_old {
 		echo
@@ -180,7 +206,7 @@ function Fusage_old {
 		echo -e "\tParametry v [] jsou volitelne." 
 		echo -e "\tKratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)"
 		echo
-		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
+		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {Váš text|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
 		echo
 		echo Postup uceni a vysvetleni jednotlivych znaku
 		echo
@@ -215,7 +241,7 @@ function Fusage_old {
 		echo
 		echo Volitelne parametry
 		echo "--rychlost - pocet pismen na cviceni (výchozí: 120)"
-		echo "--mezi-pismeny - navyšení pauzy mezi znaky a slovy (v: 100)"
+		echo "--mezi-pismeny - navyšení pauzy mezi znaky a slovy, ale znaky samotné jsou hrány rychle; Farnsworthova komprese  (v: 100)"
 		echo "--pocet-pismen - pocet znaku ve cviceni (v: 2)"
 		echo "Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu."
 		echo
@@ -236,73 +262,83 @@ function Fusage_old {
 		feh  --zoom 200 --geometry $(feh  -l "$cesta_obrazek" | awk '(NR==2) {print(($3*2)"x"($4*2));}') "$cesta_obrazek"
 		exit
 	}
+	
+	
+	
 function Fusage {
 less <<mezirici
 
-Program na uceni Morseovy abecedy
+Program na učení Morseovy abecedy
 
-Pouziti: 
-	Nejaky parametr z techto zavorek je povinny {}.
-	Parametry v [] jsou volitelne. 
-	Kratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)
+Použití: 
+	Nějaký parametr z těchto závorek je povinný {}.
+	Parametry v [] jsou volitelné. 
+	Krátké parametry s jednou pomlčkou (např. -p) jsou ekvivalentní dlouhým parametrům s dvěma pomlčkami (--pismena).
 
 $nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} 
 
-Postup uceni a vysvetleni jednotlivych znaku
+Postup učení a vysvětlení jednotlivých znaků
 
-Povinne parametry
---vypis-znaku - tabulky vsech pismen, znaku a signalu
-$nazev_programu --vypis_znaku # Seznamte se s mnemotechnickymi akrostichy znaku a pismen, nemusite se je ucit zpameti.
+Povinné parametry
+--vypis-znaku - tabulky většiny písmen, znaků a signálů
+$nazev_programu --vypis_znaku # Seznamte se s mnemotechnickými akrostichy znaků a písmen, ale nemusíte se je učit zpaměti. To příjde samo.
 
---pismena-vizualne - je nejlepsi pro uplne zacatecniky - uci jednotliva pismena a vypisuje je i na obrazovku
-$nazev_programu --pismena-vizualne cviceni1 # testuje jednoznakova pismena, tzn. e, t, a zobrazuje je
-$nazev_programu -P cviceni12 # testuje jedno- a dvouznakova pismena, tzn. etimna, a zobrazuje je
-	Po trech chybach se objevi spravna odpoved. 
-	Velke volni usili nema smysl, protoze drilujeme plazi mozek ne racionalni savci.
+--pismena-vizualne - je nejlepší pro úplné začátečníky - učí jednotlivá písmena a vypisuje je i na obrazovku
+$nazev_programu --pismena-vizualne cviceni1 # testuje jednoznaková písmena , tzn. e, t, a zobrazuje je
+$nazev_programu -P cviceni12 # testuje jedno- a dvouznaková písmena, tzn. etimna, a zobrazuje je
+	Po třech chybách se objeví správná odpověď. 
+	Velké volní úsilí nemá smysl, protože drilujeme plazí mozek a ne racionální, savčí.
 
---pismena - procvicuje jednotliva pismena, ale bez zrakove opory. Zaciname po zvladnuti predchozich
-$nazev_programu --pismena cviceni23 # testuje dvou- a triznakova pismena bez zobrazeni
-$nazev_programu -p cviceni3a # testuje po pismenu z prvni polovinu triznakových pismen
+--pismena - procvičuje jednotlivá písmena, ale bez zrakové opory. Začínáme po zvládnutí předchozích. 
+$nazev_programu --pismena cviceni23 # testuje dvou- a tříznaková písmena bez zobrazení
+$nazev_programu -p cviceni3a # testuje po písmenu z první poloviny tříznakových písmen
 
---opis - opisovani zadaneho textu do morse pomoci klaves .- a enter (mezera)
-$nazev_programu --opis "Pepa Smolik" # vyzaduje presny opis tohoto textu
-$nazev_programu -o cviceni1234 # vytvori nahodnou kominaci beznych pismen
+--opis - opisování zadaného textu do morse pomocí kláves .- a enter (mezera)
+$nazev_programu --opis "Pepa Smolík" # vyžaduje přesný opis tohoto textu
+$nazev_programu -o cviceni1234 # vytvoří nahodilou kombinaci z běžných písmen
 
---cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni
-$nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky
-$nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy
+--cviceni - příjem skupin nahodile vybraných písmen z daného cvičení
+$nazev_programu --cviceni bflmpsvz # procvičuje obojetné souhlasky
+$nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvičuje po třech čtyřznaková písmena, ale dělá mezi nimi velké pauzy
 
---diktat - vysilani vlastniho textu
-$nazev_programu --diktat # nadiktujte si vlastni text morseovkou
+--diktat - vysílání vlastního textu
+$nazev_programu --diktat # nadiktujte si vlastní text morseovkou
 
---morse - prevede zadany text do morseovy abecedy
-$nazev_programu --rychlost 200 --morse "salamista" # prevede latinsky text do morse a zahraje jej velmi rychle. Vystupni soubor bude $zvukovy_soubor"
+--morse - převede zadaný text do Morseovy abecedy
+$nazev_programu --rychlost 200 --morse "Salamista" # Převede latinkou psaný text do morse a zahraje jej velmi rychle. Výstupní soubor bude $zvukovy_soubor."
 
---latinka - prevede zadane morse znaky do latinky
+--latinka - převede zadané morse znaky do latinky
 $nazev_programu --latinka "/.../.-/--/.-// nebo |...-|---|-..|.-|"
 
-Volitelne parametry
---rychlost <cislo mezi 50 a 300> - pocet pismen na cviceni (výchozí: 120)
---mezi-pismeny <cislo mezi 100 az 1000> - navyšení pauzy mezi znaky a slovy (v: 100)
---znaku-cviceni <cislo mezi 2 az 20>- pocet znaku ve cviceni (v: 2)
-Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu.
+Volitelné parametry
+--rychlost <číslo mezi 50 a 300> - počet písmen na cvičení (výchozí: 120)
+--mezi-pismeny <číslo mezi 100 az 1000> - navýšení pauzy mezi písmeny (v: 100)
+--znaku-cviceni <číslo mezi 2 a 20> - počet znaků ve cvičení (v: 2)
+Další parametry, např. hranou notu si nastavte uvnitř skriptu.
 
-Zvukový soubor prave hraneho zvuku: $zvukovy_soubor
+Zvukový soubor právě hraného zvuku: $zvukovy_soubor
 
-Zname chyby: Nedela pismeno CH a nektere divne znaky, pouze anglickou abecedu.
+Známé chyby: Omezeně zpracovává písmeno CH a některé divné znaky. Anglická abeceda a číslice by měly fungovat bezchybně.
 
 $(Fvypis_konstant)
 
-Autor a licence:
+Autor, licence a hlášení chyb:
 	PhDr. Mgr. Jeroným Klimeš, Ph.D.
 	www.klimes.us
 	Licences under GNU GPLv3 and WTFPL
 	
-Konec napovedy: Zmacknete klavesu q a zobrazi se obrazek 
+Konec nápovědy. Zmáčkněte klávesu q a zobrazí se obrázek.
+
+PS. https://stendec.io/morse/koch.html
+The Koch method is based on exposing the student to full-speed Morse from day one. The first lesson starts with just two characters, played in full speed. The student must "copy" them (i.e. writing them down or typing them, like in this page). Once 90% of the characters are correctly "copied", the student can go move to the next lesson, where just one more character is added. 
+Kochova sekvence je: "kmrsuaptlowi.njef0y,vg5/q9zh38b?427c1d6x"
 
 mezirici
 	feh  --zoom 200 --geometry $(feh  -l "$cesta_obrazek" | awk '(NR==2) {print(($3*2)"x"($4*2));}') "$cesta_obrazek" &
 	exit
+	
+var lesson_seq = "kmrsuaptlo" + "wi.njef0y," + "vg5/q9zh38" + "b?427c1d6x";
+	
 	}
 function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
 	Gcviceni_text=""
@@ -336,7 +372,7 @@ function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
 	else Gvyber=$Gtext
 		nasel=false
 	fi
-	delka_vyber=${#Gvyber}
+	delka_vyber=${#Gvyber} 
 # 	echo "cviceni($cviceni) opisovani($opisovani) nasel($nasel)"
 # 	if $cviceni || ( $opisovani && $nasel ) ; then 
 	if $cFlag; then 
@@ -476,7 +512,7 @@ function Fmorseovka_hrani { #$1 - morse string  $2 ":" potlacuje vizualni vystup
 		elif [ "$znak" == $'\n' ]; then 
 			: # konec radku ignoruj
 		else
-			: echo "Debug: String obsahuje nejaky divne znaky >>$znak<< mimo -.| a mezery"
+			: echo "Debug: String obsahuje nějaké divné znaky. >>$znak<< mimo -.| a mezery"
 		fi
 		done <<<$string
 # 	echo	
@@ -508,7 +544,7 @@ function Fpismena {
 	REPLY=""
 	pismeno_morse=""
 	pismeno_slovem=""
-	echo "Nápověda: Středník ; ukončuje cvičení"
+	echo "Nápověda: Středník ; ukončuje cvičení."
 	echo 
 	date +%Y-%m-%d_%H-%M-%S >> jkmorseovka$(date +%Y-%m-%d).log
 	s=0
@@ -535,7 +571,7 @@ function Fpismena {
 			echo -ne "                                                                              \r"
 			((abeceda_statistika_pokusy[$cislo_pismena]++)) 
 			if [ "$REPLY" == ";" ]; then 
-				echo -e "	(spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)	v=$(( (6000*$s / $sekund ) / 100 )) zn/min\t$(( $sekund / $s )) s/zn"
+				echo -e "	(správně/pokusů=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)	v=$(( (6000*$s / $sekund ) / 100 )) zn/min\t$(( $sekund / $s )) s/zn	 $words_per_minute wpm"
 				echo " $spravne/$pokusu=$(( 100*spravne/pokusu ))% v=$(( (6000*$s / $sekund ) / 100 )) z/min $(( $sekund / $s )) sekund/znak" >> jkmorseovka$(date +%Y-%m-%d).log 
 					{
 					echo 
@@ -548,10 +584,10 @@ function Fpismena {
 							[ "${abeceda_statistika_pokusy[$i]}" != "0"  ] && echo  "${abeceda[$i]} ${abeceda_statistika_chyby[$i]}/${abeceda_statistika_pokusy[$i]}=$(bc -l <<<"scale=3;${abeceda_statistika_chyby[$i]}/${abeceda_statistika_pokusy[$i]}") ${abeceda_statistika_sekundy[$i]}/${abeceda_statistika_pokusy[$i]}=$(bc -l <<<"scale=3; ${abeceda_statistika_sekundy[$i]}/${abeceda_statistika_pokusy[$i]}")"
 							done
 						echo
-						} |sort  --field-separator="=" -k3 > /dev/shm/jkmorseovka_statistika.tmp # --reverse
+						} |sort  --field-separator="=" -k3 > $adresar/jkmorseovka_statistika.tmp # --reverse
 					}
-					cat /dev/shm/jkmorseovka_statistika.tmp
-					posledni_mohykani=$(sed "s/^\(.\).*/\1/" /dev/shm/jkmorseovka_statistika.tmp | tr -d "\n" )
+					cat $adresar/jkmorseovka_statistika.tmp
+					posledni_mohykani=$(sed "s/^\(.\).*/\1/" $adresar/jkmorseovka_statistika.tmp | tr -d "\n" )
 					echo $posledni_mohykani
 					echo 
 					echo Z těchto znaků si vězměte nejpomalejších posledních pět a důkladně je procvičte, např:
@@ -565,13 +601,13 @@ function Fpismena {
 				((s++)) # dalsi pismeno
 				[ $chybil == 0 ] && ((spravne++))
 				if $statistika; then 
-					echo -e "$(align_right 7 "$pismeno_morse")" "$(align_left 20 "$pismeno_slovem")" "$(align_right 5 "$(($sekund - $sekund_old))")"
+					echo -e "$(align_right 10 "$pismeno_morse")" "$(align_left 20 "$pismeno_slovem")" "$(align_right 5 "$(($sekund - $sekund_old))")" 
 					else
-					echo -e "$(align_right 7 "$pismeno_morse")" "$(align_left 20 "$pismeno_slovem")"
+					echo -e "$(align_right 10 "$pismeno_morse")" "$(align_left 20 "$pismeno_slovem")" "$words_per_minute wpm"
 				fi
 # 				printf '     %-6s %15s %15d\n' "$pismeno_morse" "$pismeno_slovem" $(($sekund - $sekund_old))
 				# echo			printf '\r%10s %-15s %15d \n'  "$pismeno_morse" "$pismeno_slovem" $(($sekund - $sekund_old))
-				printf "\t%20s %15s% 15s%-15s\r" "spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%" "v=$(( (6000*$s / $sekund ) / 100 ))zn/min" "$(( $sekund / $s ))s/zn"
+				printf "\t%20s %15s% 15s%-15s%-15s\r" "spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%" "v=$(( (6000*$s / $sekund ) / 100 ))zn/min" "$(( $sekund / $s ))s/zn	$words_per_minute wpm"
 # 				echo -en "	(spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)	v=$(( (6000*$s / $sekund ) / 100 )) zn/min	$(( $sekund / $s )) s/zn \r"
 # 				echo " $pismeno_morse $pismeno_slovem	(spravne/pokusu=$spravne/$pokusu=$(( 100*spravne/pokusu ))%)"
 				echo "$(date +%Y-%m-%d_%H-%M-%S) $pismeno 1 $(($sekund - $sekund_old))" >> jkmorseovka$(date +%Y-%m-%d).log
@@ -611,7 +647,7 @@ function Fcteni_znaku { # cte cele morse znaky, ale bez prubezneho zvuku; pomocn
 	}
 function Fdiktat	{ # $1 ":" vypina vypis
 	if [ "$2" == ""  ]; then # nacte znaky z klavesnice
-		echo "Jiny znak nez .- ukoncuje pismeno. Cely zapis ukoncuje strednik; "
+		echo "Jiný znak než .- ukončuje písmeno. Celý zápis ukončuje středník; "
 		morse_diktat="" # cely diktat
 		diktat_text="" #jednotlive tecky_carky
 		pismeno_latinkou=""
@@ -676,7 +712,7 @@ function Fdiktat	{ # $1 ":" vypina vypis
 		echo "$cely_text_latinkou" 
 		Fmorseovka_hrani "$cely_text" > /dev/null
 		echo -e "\tZvukový soubor: $zvukovy_soubor"
-		read -e -p "Prehrat jeste jednou? [y/N] "
+		read -e -p "Přehrát ještě jednou? [y/N] "
 		echo
 	done
 	}
@@ -753,7 +789,7 @@ function Fopisovani {
 			play "$zvukovy_soubor" &> /dev/null
 		else	
 			echo
-			echo "Opiste tento text v morseovce: "
+			echo "Opište tento text v morseovce: "
 			echo "                                $Gcviceni_text"
 			echo
 			echo -n "|"
@@ -769,20 +805,20 @@ function Fopisovani {
 # 				Gcviceni_text=""
 			else
 				echo "	Neshoda: $Gcviceni_text !=$cely_text_latinkou" 
-				echo "		Spravne: $morse"
+				echo "		Správně: $morse"
 				Fmorseovka_hrani "$morse"
 			fi 
 			echo
 			cely_text_latinkou=""
 		fi
-		read -N1 -e -p "Vyzkouset jeste jednou? (p - prehrat znovu. Konec ;) [Y/n/p] "
+		read -N1 -e -p "Vyzkoušet ještě jednou? (p - přehrát znovu. Konec ;) [Y/n/p] "
 		done 
 	}		
 function Fprocvicovani { # $1 textlatinkou
 	latinka=$1
 	echo
-	echo -e "\t Hraji soubor: play $zvukovy_soubor "
-	echo "Napoveda: [? help][; konec][cteni - hledani morse znaku]"
+	echo -e "\t Hraji soubor: $zvukovy_soubor "
+	echo "[; konec]"
 	echo
 # 	REPLY="y"
 	i=1
@@ -795,12 +831,12 @@ function Fprocvicovani { # $1 textlatinkou
 		read -n $Gpocet_pismen_cviceni  -e -i "$odpoved"  -p "Co slyšíte? " odpoved
 		if [[ "$odpoved" =~ .*\;.* ]];then break
 		elif [ "$odpoved" == cteni ]; then Fcteni_znaku;
-		elif [ "$odpoved" == "?" ]; then 
-			echo Mělo by to být: $latinka;
+# 		elif [ "$odpoved" == "?" ]; then 
+# 			echo Mělo by to být: $latinka;
 		elif [ "$odpoved" == "$latinka" ];then	
 			sekund=$(( $(date "+%s") - $start ))
 			s=$(( Gpocet_pismen_cviceni + s )) # celkem pismen
-			echo -e "\tSpravne na $i. pokus. Zadani: $latinka $morse	Rychlost: $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" 
+			echo -e "\tSprávně na $i. pokus. Zadání: $latinka $morse	Rychlost: $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" 
 			echo "$(date +%Y-%m-%d_%H-%M-%S) $latinka $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
 			Fcviceni # vytvori novy nahodily retezec v Gcviceni_text
 			latinka=$Gcviceni_text
@@ -809,7 +845,7 @@ function Fprocvicovani { # $1 textlatinkou
 			if [ "$REPLY" == ";" ];then break; fi
 			odpoved=""
 		else #if [ "$odpoved" != "$latinka" ];then 
-			echo -e "\tSpatne ($i)."
+			echo -e "\tŠpatně ($i)."
 		fi
 		((i++))
 	done 
@@ -884,13 +920,14 @@ function Fprocvicovani { # $1 textlatinkou
 #                 is_flag=true; 
                 ;;
             p) 
-			    if [ "$OPTARG" == "" ]; then
-					echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
-					echo "jkmorseovka.sh --pismena cviceni123"
-					exit
-				else
-					Gtext="$OPTARG";  	
-				fi
+# 			    if [ "$OPTARG" == "" ]; then
+# 					echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
+# 					echo "jkmorseovka.sh --pismena cviceni123"
+# 					exit
+# 				else
+# 					Gtext="$OPTARG";  	
+# 				fi
+				Gtext="$OPTARG";  	
                 pFlag=true; 
                 is_flag=true; 
 #                 break
@@ -899,28 +936,32 @@ function Fprocvicovani { # $1 textlatinkou
                 is_flag=true; 
 				pFlag=true;   
 				PFlag=true;   
-			    if [ "$OPTARG" == "" ]; then
-						echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
-						echo "jkmorseovka.sh --pismena-vizualne cviceni123"
-						exit
-					else
-						Gtext="$OPTARG";  	
-					fi
+# 			    if [ "$OPTARG" == "" ]; then
+# 						echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
+# 						echo "jkmorseovka.sh --pismena-vizualne cviceni123"
+# 						exit
+# 					else
+# 						Gtext="$OPTARG";  	
+# 					fi
+				Gtext="$OPTARG";  	
 				if $PFlag; then 
-						pismena_vizualne=" " # dvojtecka respektive mezera - pri cviceni pismena se vypisuji carky tecky na obrazovku
-					else
-						pismena_vizualne=":" 				
-					fi
+					pismena_vizualne=" " # dvojtecka respektive mezera - pri cviceni pismena se vypisuji carky tecky na obrazovku
+				else
+					pismena_vizualne=":" 				
+				fi
 # 				break	
 				;;
             c) 
-			    if [ "$OPTARG" == "" ]; then
-					echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
-					echo "jkmorseovka.sh --pismena cviceni123"
-					exit
-				else
-					Gtext="$OPTARG";  	
-				fi
+# 			    if [ "$OPTARG" == "" ]; then
+# 					echo "Text na procvicovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
+# 					echo "jkmorseovka.sh --pismena cviceni123"
+# 					exit
+# 				else
+# 					Gtext="$OPTARG";
+# 					Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,})
+# 				fi
+					Gtext="$OPTARG";
+					Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,})
                 cFlag=true; 
                 is_flag=true; 
                 ;;
@@ -930,46 +971,52 @@ function Fprocvicovani { # $1 textlatinkou
                 xFlag=true; 
                 ;;
             o) 
-			    if [ "$OPTARG" == "" ]; then
-					echo "Text na opisovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
-					echo "jkmorseovka.sh --opisovani cviceni123"
-					exit
-				else
-# 					Gtext="$OPTARG";
+# 			    if [ "$OPTARG" == "" ]; then
+# 					echo "Text na opisovani musi byt zadan: Bud vyctem pismen \"bflmpsvz\" nebo odkazem na cviceni: \"cviceni4a\", napr.:"
+# 					echo "jkmorseovka.sh --opisovani cviceni123"
+# 					exit
+# 				else
+# # 					Gtext="$OPTARG";
+# 					Gtext=${OPTARG,,} # mala pismena
+# 					Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,})
+# 				fi
 					Gtext=${OPTARG,,} # mala pismena
-				fi
+					Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,})
 				oFlag=true; 
                 is_flag=true; 
 #                 break
                 ;;
             m) 
 #  				echo "optarg($OPTARG) Gpocet_pismen_cviceni($Gpocet_pismen_cviceni)"
-			    if [ "$OPTARG" == "" ]; then
-					echo "Text na prevod musi byt zadan latinkou, např.:"
-					echo "jkmorseovka.sh --morse \"Ervenice\""
-					exit
-				else
-# 					Gtext="$OPTARG";  	
-					Gtext=${OPTARG,,} # prevede na mala pismena
-#  				echo "optarg($OPTARG) Gtext($Gtext) Gpocet_pismen_cviceni($Gpocet_pismen_cviceni)"
-				fi
+# 			    if [ "$OPTARG" == "" ]; then
+# 					echo "Text na prevod musi byt zadan latinkou, např.:"
+# 					echo "jkmorseovka.sh --morse \"Ervěnice\""
+# 					exit
+# 				else
+# # 					Gtext="$OPTARG";  	
+# # 					Gtext=${OPTARG,,} # prevede na mala pismena
+# 					Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,}) # prevede na mala pismena
+# #  				echo "optarg($OPTARG) Gtext($Gtext) Gpocet_pismen_cviceni($Gpocet_pismen_cviceni)"
+# 				fi
+				Gtext=$(iconv -f utf8 -t us-ascii//translit <<<${OPTARG,,}) # prevede na mala pismena
                 mFlag=true; 
                 is_flag=true; 
                 ;;
             l) 
 #  				echo "optarg($OPTARG) Gpocet_pismen_cviceni($Gpocet_pismen_cviceni)"
-			    if [ "$OPTARG" == "" ]; then
-					echo "Text na prevod musi byt zadan morseovkou, např.:"
-					echo "jkmorseovka.sh --morse \"/.../.-/--/.-/ |...-|---|-..|.-|\""
-					exit
-				else
-					Gtext="$OPTARG";  	
-				fi
+# 			    if [ "$OPTARG" == "" ]; then
+# 					echo "Text na prevod musi byt zadan morseovkou, např.:"
+# 					echo "jkmorseovka.sh --morse \"/.../.-/--/.-/ |...-|---|-..|.-|\""
+# 					exit
+# 				else
+# 					Gtext="$OPTARG";  	
+# 				fi
+				Gtext="$OPTARG";  	
                 lFlag=true; 
                 is_flag=true; 
                 ;;
             \?) echo
-				echo "Tento argument vyzaduje specifikovany text nebo cviceni (zpravidla cviceni1234)"
+				echo "Tento argument vyžaduje upřesněný text nebo cvičení (zpravidla cviceni1234)."
 				echo
 				Fusage 
 				;;
