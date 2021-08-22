@@ -1,8 +1,5 @@
 #!/bin/bash
  
-# smazal jsem sort2
-
-
 # TODO vypisy obrazovek: nohup jkmorseovka.sh -h | tee vystup.out
 # TODO dat vystup do prikazu column
 # TODO pismena neopakuji do omrzeni spatne pismeno

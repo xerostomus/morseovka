@@ -39,7 +39,8 @@ Nápověda se ukončuje písmenem q - quit a je v ní napsán celý postup, jak 
 
 jkmorseovka.sh --vypis_znaku
 
-Napřed se zcela povrchně seznámíme s mnemotechnickými frázemi, které napovídají morse znak, např. Kákorá -.-. Po ukončení nápovědy se zobrazí obrázek s tabulkou, která se čte vždy od shora dolu s tím, že černý proužek je čárka, bílý tečka. Takže když sestupujeme odshora k písmenu K, tak máme černá - bílá - černá, čili "-.-". 
+Napřed se zcela povrchně seznámíme s mnemotechnickými frázemi, které napovídají morse znak, např. Kákorá -.-. Po ukončení nápovědy se zobrazí obrázek s tabulkou, která se čte vždy od shora dolu s tím, že černý proužek je čárka, bílý tečka. Takže když sestupujeme odshora k písmenu K podél šipky, tak máme černá - bílá - černá, čili "-.-". 
+<a href=jkmorseovka_navod.png><img src=jkmorseovka_navod.png width=40% align="left" border=0></a>
 
 Druhým krokem se nácvik po písmenech:
 
