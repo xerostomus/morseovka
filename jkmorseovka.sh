@@ -8,9 +8,11 @@
 adresar=/dev/shm
 zvukovy_soubor="jkmorseovka.ogg" # toto uklada do aktualniho adresare, ale je to pomalejsi
 zvukovy_soubor="$adresar/jkmorseovka.ogg" # uklada do shared memory virtualniho disku v RAM pameti pocitace - je to velmi rychle, ale po vypnuti pocitace se to maze.
-Gpocet_pismen_cviceni=5 # nahodile cviceni jede po 5 pismenech
+# Gpocet_pismen_cviceni=2 # nahodile cviceni jede po 2 pismenech
+Gpocet_pismen_cviceni=7 # nahodile cviceni jede po 7 pismenech, nejlepsi pro Kocha
+# Gpocet_pismen_cviceni=5 # nahodile cviceni jede po 5 pismenech, pro ctyrpismena skupiny, napr. cviceni2, 3a ap.
 Gpocet_pismen_opisovani=5 # pouze u cviceni, jinak opisuje cely zadany text
-Gpocet_pismen_cviceni=2 # nahodile cviceni jede po 5 pismenech
+abeceda_postupne="mnatioegkdwrusqzycxbjplfvh0123456789.,?/" # zde si nadefinujte vlastni poradi, jak se chcete ucit pismena
 
 debug=":" #nebo " "
 # Grychlost=100 # 120 strední
@@ -18,6 +20,7 @@ debug=":" #nebo " "
 # Grychlost=150 # 120 strední
 Grychlost=150 # 150 strední - vychozi
 Gmezi_znaky=100 # 100 strední/normovana
+Gmezi_znaky=400 # nejlepsi pro Kocha
 
 # globalni promenne krome logickych promennych
 # 	Gtext - zadani z prikazove radky, napr cviceni123
@@ -33,9 +36,10 @@ if [ "$(whereis sox | cut -d: -f2)" == "" ]||[ "$(whereis feh | cut -d: -f2)" ==
 	sudo apt install sox feh bc # pro prikaz play, obrazek a vypocty
 	fi
 	
+abeceda_koch="kmrsuaptlowi.njef0y,vg5/q9zh38b?427c1d6x"
 abeceda=( a b c d e f g h ch i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 " " ä ë ö ü "," "." ":" ";" "?" "!" "-" "/" "=" "_" "“" "<->" "@" ")" "("  )	# ch se samozrejme nevyhodnocuje
-abecedamorseova=( ".-" "-..." "-.-." "-.." "." "..-." "--." "...." "----" ".." ".---" "-.-" ".-.." "--" "-." "---" ".--." "--.-" ".-." "..." "-" "..-" "...-" ".--" "-..-"  "-.--" "--.." "-----" ".----" "..---" "...--" "....-" "....." "-...." "--..." "---.." "----." " " ".-.-" "..-.." "---." "..--" "--..--" ".-.-.-" "---..." "-.-.-." "..--.." "--...-" "-....-" "-..-." "-...-" "..--.-" ".-..-." ".----." ".--.-." "-.--.-" "-.--." )	
-abecedaslovem=( "akát" "blýskavice" "cílovníci" "dálava" "erb" "Filipíny" "Grónská zem" "hrachovina" "chvátá k nám sám" "ibis" "jasmín bílý" "krákorá" "lupíneček" "mává" "národ" "ó náš pán" "papírníci" "qílí orkán" "rarášek" "sekera" "trám" "uličník" "vyučený" "wagón klád" "xénokratés" "ýgar mává" "známá žena" 0 1 2 3 4 5 6 7 8 9 "mezera" "a umlaut"  "e umlaut" "o umlaut" "u umlaut" "Čárka" "Tečka" "Dvojtečka" "Středník" "Otazník" "Vykřičník" "Pomlčka" "Lomítko" "Rovnítko" "Podtržítko" "Uvozovka" "Tabulátor" "Zavináč" "Kulatá závorka zavírací" "Kulatá závorka otevírací" )
+abeceda_morseova=( ".-" "-..." "-.-." "-.." "." "..-." "--." "...." "----" ".." ".---" "-.-" ".-.." "--" "-." "---" ".--." "--.-" ".-." "..." "-" "..-" "...-" ".--" "-..-"  "-.--" "--.." "-----" ".----" "..---" "...--" "....-" "....." "-...." "--..." "---.." "----." " " ".-.-" "..-.." "---." "..--" "--..--" ".-.-.-" "---..." "-.-.-." "..--.." "--...-" "-....-" "-..-." "-...-" "..--.-" ".-..-." ".----." ".--.-." "-.--.-" "-.--." )	
+abeceda_slovem=( "akát" "blýskavice" "cílovníci" "dálava" "erb" "Filipíny" "Grónská zem" "hrachovina" "chvátá k nám sám" "ibis" "jasmín bílý" "krákorá" "lupíneček" "mává" "národ" "ó náš pán" "papírníci" "qílí orkán" "rarášek" "sekera" "trám" "uličník" "vyučený" "wagón klád" "xénokratés" "ýgar mává" "známá žena" 0 1 2 3 4 5 6 7 8 9 "mezera" "a umlaut"  "e umlaut" "o umlaut" "u umlaut" "Čárka" "Tečka" "Dvojtečka" "Středník" "Otazník" "Vykřičník" "Pomlčka" "Lomítko" "Rovnítko" "Podtržítko" "Uvozovka" "Tabulátor" "Zavináč" "Kulatá závorka zavírací" "Kulatá závorka otevírací" )
 # intestines=$(printf "%s\n" ${names[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ")
 # echo "declare -A abeceda_asociativni=( $(printf "%s\n" ${abeceda[@]} | awk '{ print "["$1"]="FNR  }' | tr "\n" " ") )"; exit # toto je radka, ktera vytvori nasledujici retezec 
 declare -A abeceda_asociativni=( [a]=1 [b]=2 [c]=3 [d]=4 [e]=5 [f]=6 [g]=7 [h]=8 [ch]=9 [i]=10 [j]=11 [k]=12 [l]=13 [m]=14 [n]=15 [o]=16 [p]=17 [q]=18 [r]=19 [s]=20 [t]=21 [u]=22 [v]=23 [w]=24 [x]=25 [y]=26 [z]=27 [0]=28 [1]=29 [2]=30 [3]=31 [4]=32 [5]=33 [6]=34 [7]=35 [8]=36 [9]=37 [ä]=38 [ë]=39 [ö]=40 [ü]=41 [,]=42 [.]=43 [:]=44 [;]=45 [?]=46 [!]=47 [-]=48 [/]=49 [=]=50 [_]=51 [“]=52 [<->]=53 ["@"]=54 [)]=55 [(]=56  )
@@ -194,74 +198,6 @@ mezirici
 	\nPauza mezi teckami a čárkami má trvaní tečky. 
 	\nObvyklá, leč nezávazná frekvence tónu je 800 Hz, tedy přibližně nota G5 MIDI, nebo G'' (784 Hz)"
 	}
-function Fusage_old {
-		echo
-		echo Program na uceni Morseovy abecedy
-		echo
-		echo "Pouziti:" 
-		echo -e "\tNejaky parametr z techto zavorek je povinny {}."
-		echo -e "\tParametry v [] jsou volitelne." 
-		echo -e "\tKratke parametry s jednou pomlckou (napr. -p) jsou ekvivalentni dlouhym parametrum s dvema pomlckami (--pismena)"
-		echo
-		echo "$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {Váš text|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} "
-		echo
-		echo Postup uceni a vysvetleni jednotlivych znaku
-		echo
-		echo Povinne parametry
-		echo "--vypis-znaku - tabulky vsech pismen, znaku a signalu"
-		echo "$nazev_programu --vypis_znaku # Nekolikrat si prectete prehled znaku a pismen"
-		echo
-		echo "--pismena-vizualne - je nejlepsi pro uplne zacatecniky - uci jednotliva pismena a vypisuje je i na obrazovku"
-		echo "$nazev_programu --pismena-vizualne cviceni1 # testuje jednoznakova pismena, tzn. e, t, a zobrazuje je"
-		echo "$nazev_programu -P cviceni12 # testuje jedno- a dvouznakova pismena, tzn. etimna, a zobrazuje je"
-		echo
-		echo "--pismena - procvicuje jednotliva pismena, ale bez zrakove opory. Zaciname po zvladnuti predchozich"
-		echo "$nazev_programu --pismena cviceni23 # testuje dvou- a triznakova pismena bez zobrazeni"
-		echo "$nazev_programu -p cviceni3a # testuje po pismenu z prvni polovinu triznakových pismen"
-		echo
-		echo "--opis - opisovani zadaneho textu do morse pomoci klaves .- a enter (mezera)"
-		echo "$nazev_programu --opis "Pepa Smolik" # vyzaduje presny opis tohoto textu"
-		echo "$nazev_programu -o cviceni1234 # vytvori nahodnou kombinaci beznych pismen"
-		echo
-		echo "--cviceni - prijem skupin nahodile vybranych pismen z daneho cviceni"
-		echo "$nazev_programu --cviceni bflmpsvz # procvicuje obojetne souhlasky"
-		echo "$nazev_programu -c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvicuje po trech ctyrznakova pismena, ale dela mezi nimi velke pauzy"
-		echo
-		echo "$nazev_programu --diktat # nadiktujte si vlastni text morseovkou"
-		echo "--diktat - vysilani vlastniho textu"
-		echo
-		echo "--morse - prevede zadany text do morseovy abecedy"
-		echo "$nazev_programu --rychlost 200 --morse \"salamista\" # prevede latinsky text do morse a zahraje jej velmi rychle. Vystupni soubor bude $zvukovy_soubor"
-		echo
-		echo "--latinka - prevede zadane morse znaky do latinky"
-		echo "$nazev_programu --latinka \"/.../.-/--/.-/\" nebo \"|...-|---|-..|.-|\""
-		echo
-		echo Volitelne parametry
-		echo "--rychlost - pocet pismen na cviceni (výchozí: 120)"
-		echo "--mezi-pismeny - navyšení pauzy mezi znaky a slovy, ale znaky samotné jsou hrány rychle; Farnsworthova komprese  (v: 100)"
-		echo "--pocet-pismen - pocet znaku ve cviceni (v: 2)"
-		echo "Dalsi parametry, napr. hrana nota, se nastavuji uvnitr skriptu."
-		echo
-		echo "Zvukový soubor prave hraneho zvuku: $zvukovy_soubor"
-		echo
-		echo "Zname chyby: Nedela pismeno CH a nektere divne znaky, pouze anglickou abecedu"
-		echo ""
-		read -p "Enter - další stránka"
-# 		echo "Postup učení Morseovy abecedy"
-		echo
-		Fvypis_konstant
-		echo
-		echo Autor a licence:
-		echo -e "\tPhDr. Mgr. Jeroným Klimeš, Ph.D."
-		echo -e "\twww.klimes.us"
-		echo -e "\tLicences under GNU GPLv3 and WTFPL"
-		
-		feh  --zoom 200 --geometry $(feh  -l "$cesta_obrazek" | awk '(NR==2) {print(($3*2)"x"($4*2));}') "$cesta_obrazek"
-		exit
-	}
-	
-	
-	
 function Fusage {
 less <<mezirici
 
@@ -272,7 +208,7 @@ Použití:
 	Parametry v [] jsou volitelné. 
 	Krátké parametry s jednou pomlčkou (např. -p) jsou ekvivalentní dlouhým parametrům s dvěma pomlčkami (--pismena).
 
-$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345} 
+$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|koch2 az koch40|postupne2 az postupne40|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345}
 
 Postup učení a vysvětlení jednotlivých znaků
 
@@ -297,6 +233,9 @@ $nazev_programu -o cviceni1234 # vytvoří nahodilou kombinaci z běžných pís
 --cviceni - příjem skupin nahodile vybraných písmen z daného cvičení
 $nazev_programu --cviceni bflmpsvz # procvičuje obojetné souhlasky
 $nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvičuje po třech čtyřznaková písmena, ale dělá mezi nimi velké pauzy
+$nazev_programu --cviceni koch5 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10 # ručně nastavené parametry u Kochovy metody (začínáme koch1 a pokračujeme postupně až do koch40)
+Uvnitř skriptu si můžete nastavit proměnnou abeceda_postupne, kde si nastavíte vlastní pořadí písmen.
+$nazev_programu --cviceni postupne3 # popř. další parametry jako u Kochovy metody.
 
 --diktat - vysílání vlastního textu
 $nazev_programu --diktat # nadiktujte si vlastní text morseovkou
@@ -340,7 +279,17 @@ var lesson_seq = "kmrsuaptlo" + "wi.njef0y," + "vg5/q9zh38" + "b?427c1d6x";
 function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
 	Gcviceni_text=""
 	nasel=true
-	if   [ "$Gtext" == "cviceni1"  ]; 	then Gvyber="te"
+	if   [[ "$Gtext" =~ ^koch[0-9]+$ ]]; 	then 
+		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+# 		Gvyber=$(sed -r "s/^(.{$koch_pocet}).*$/\1/" <<<$abeceda_koch)
+		Gvyber=$(head -c $koch_pocet <<<$abeceda_koch) # head je jednodussi nez sed
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=6 # nahodile cviceni jede po 10 pismenech, nejlepsi pro Kocha
+# 		echo koch Gtext $Gtext 		Gvyber $Gvyber
+	elif   [[ "$Gtext" =~ ^postupne[0-9]+$ ]]; 	then 
+		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+		Gvyber=$(head -c $koch_pocet <<<$abeceda_postupne) # head je jednodussi nez sed
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=6 # nahodile cviceni jede po 5 pismenech, nejlepsi pro Kocha
+ 	elif [ "$Gtext" == "cviceni1"  ]; 	then Gvyber="te"
 	elif [ "$Gtext" == "cviceni2"  ]; 	then Gvyber="mnai"
 	elif [ "$Gtext" == "cviceni12" ]; 	then Gvyber="temnai"
 	elif [ "$Gtext" == "cviceni3"  ]; 	then Gvyber="ogkdwrus"
@@ -407,8 +356,8 @@ function Fpismeno_do_morse { # $1 jedno pismeno latinkou vraci morsekod
 		preskoc=false
 		if [ "${abeceda[$j]}" == "$1" ];then 
 			cislo_pismena=$j;
-			pismeno_morse="${abecedamorseova[$cislo_pismena]}"
-			pismeno_slovem="${abecedaslovem[$cislo_pismena]}"
+			pismeno_morse="${abeceda_morseova[$cislo_pismena]}"
+			pismeno_slovem="${abeceda_slovem[$cislo_pismena]}"
 			break
 		fi
 	done
@@ -426,8 +375,8 @@ function Fpismeno_do_slov { # $1 jedno pismeno latinkou vraci morsekod mnemotech
 		preskoc=false
 		if [ "${abeceda[$j]}" == "$1" ];then 
 			cislo_pismena=$j;
-# 			pismeno_morse=${abecedamorseova[$cislo_pismena]}
-			pismeno_slovem=${abecedaslovem[$cislo_pismena]}
+# 			pismeno_morse=${abeceda_morseova[$cislo_pismena]}
+			pismeno_slovem=${abeceda_slovem[$cislo_pismena]}
 			break
 		fi
 	done
@@ -445,14 +394,14 @@ function Fmorse_do_latinky { # $1 morse znaky
 	for ((n=1; n <= pocet_kodu; n++ )); do
 		morse_kod=$(cut -f$n -d\| <<<$1)
 		if [ "$morse_kod" == "" ]; then morse_kod=" "; fi # prevadi || na | |, ale takto by to slo take # $(sed  's/||/| |/g' <<<$1)
-		for ((j=0; j<${#abecedamorseova[@]}; ++j)); do
+		for ((j=0; j<${#abeceda_morseova[@]}; ++j)); do
 			preskoc=false
-			if [ "${abecedamorseova[$j]}" == "$morse_kod" ];then 
-	# 			echo "${abecedamorseova[$j]}" --- "$1"
+			if [ "${abeceda_morseova[$j]}" == "$morse_kod" ];then 
+	# 			echo "${abeceda_morseova[$j]}" --- "$1"
 				cislo_pismena=$j;
 				pismeno_latinkou=${abeceda[$cislo_pismena]}
-				pismeno_morse=${abecedamorseova[$cislo_pismena]}
-				pismeno_slovem=${abecedaslovem[$cislo_pismena]}
+				pismeno_morse=${abeceda_morseova[$cislo_pismena]}
+				pismeno_slovem=${abeceda_slovem[$cislo_pismena]}
 #  				if [ "$morse_kod" == " " ]; then echo naslo mezeru; fi
 # 	  	echo;echo "$i cislo_pismena($cislo_pismena); pismeno_morse($pismeno_morse); pismeno_slovem($pismeno_slovem)"
 				break # v techto promennych je posledni znak - 
@@ -814,6 +763,8 @@ function Fopisovani {
 function Fprocvicovani { # $1 textlatinkou
 	latinka=$1
 	echo
+# 	echo Z Kochovy abecedy procvičujeme: $Gvyber
+	echo Procvičujeme: $Gvyber
 	echo -e "\t Hraji soubor: $zvukovy_soubor "
 	echo "[; konec]"
 	echo
@@ -825,7 +776,8 @@ function Fprocvicovani { # $1 textlatinkou
 		morse=$(Flatinka_do_morse $latinka)
 # 		echo "morse($morse) latinka($latinka)"
 		Fmorseovka_hrani "$morse" &> /dev/null
-		read -n $Gpocet_pismen_cviceni  -e -i "$odpoved"  -p "Co slyšíte? " odpoved
+# 		read -n $Gpocet_pismen_cviceni  -e -i "$odpoved"  -p "Co slyšíte? " odpoved
+		read -n $Gpocet_pismen_cviceni  -e  -p "Co slyšíte? " odpoved # je lepsi, kdyz celou skupinu opise znova
 		if [[ "$odpoved" =~ .*\;.* ]];then break
 		elif [ "$odpoved" == cteni ]; then Fcteni_znaku;
 # 		elif [ "$odpoved" == "?" ]; then 

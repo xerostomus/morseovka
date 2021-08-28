@@ -68,12 +68,31 @@ Kochova metoda a časový skluz
 
 O toto vypínání savčího mozku se snaží metoda Ludwig Koch, kterou vymyslel před válkou (1930), která učí morseovku podobně jako se děti téměř plné rychlosti učí rodný jazyk: "Pocem!" a ne "Pojď sem!". Napřed se v plné rychlosti učíme dvě písmena KM a pak pomalu přidáváme další, když chybovost poklesne pod 10 %, tzn. když už je vcelku vytvořené reflexní spojení. Kochův přístup vede k tomu, že od začátku se učíme poslouchat jedno písmeno a zároveň psát předposlední jaksi ve skluzu. Například máme-li text BFL. Když posloucháme B, nic nepíšeme. Když už poslouchápme písmeno F, tak píšeme předchozí B. Když posloucháme L, píšeme rozeznané F. Když skončilo vysílání, tak dopíšeme poslední L.
 
-Osobně se domnívám, že pro lidi, kteří se chtějí jen naučit morseovu abecedu, trochu ji provičit, aby ji jen tak nezapomněli, ale dál se nechtějí améterskému radiu věnovat, tak stačí tento můj program. Prostě kdo analyzuje jen napsanou morseovku na papíře (telegraf, táborové hry), nemusí se učit psát písmena s latencí oproti poslouchanému zvuku. Pokud ale chtějí chytat 10 slov za minutu, tak musejí přejít na Kochovu metodu. Ovšem ta vyžaduje mnohem větší dril a delší učení, než pouhé naučení a procvičení písmen. Velice hezká stránka je <a href=https://stendec.io/morse/koch.html target=_blank>https://stendec.io/morse/koch.html</a>.
+Osobně se domnívám, že pro lidi, kteří se chtějí jen naučit morseovu abecedu, trochu ji provičit, aby ji jen tak nezapomněli, ale dál se nechtějí améterskému radiu věnovat, tak stačí se naučit jen jednotlivá písmena pomocí parametru --pismena, popř. --pismena-vizualne. Prostě kdo analyzuje jen napsanou morseovku na papíře (telegraf, táborové hry), nemusí se učit psát písmena s latencí oproti poslouchanému zvuku. Pokud ale chtějí chytat 10 slov za minutu, tak musejí přejít na Kochovu metodu. Ovšem ta vyžaduje mnohem větší dril a delší učení, než pouhé naučení a procvičení písmen. Velice hezká stránka, která mě inspirovala, je tato:<a href=https://stendec.io/morse/koch.html target=_blank>https://stendec.io/morse/koch.html</a>.
+
+Hlavní přednost Kochovy metody je, že odnaučí člověka využívat tzv. senzorický registr. Například, když slyšíte -.-, a nenaskočí vám automaticky písmeno K, tak si ten zvuk začnete přehrávat z tzv. senzorického registru, ve kterém jsou přibližně poslední dvě sekundy vnímaného zvuku či obrazu. Začnete si opakovat "-.- -.- -.-, čárka tečka čárka, co by to mohlo být?". Jenže to máte zapnutý jak senzorický registr, tak racionální mozek a to je ke škodě. Když ale Kochova technika vás tlačí dopředu, naučíte se tento senzorický registr nevyužívat, ale to znamená, že se musí mnohem více zautomatizovat spojení slyšený kód --> pismeno. 
+
+Odvrácenou stranou Kochova přístupu bývá naopak časový stres, které působí časový skluz při zápisu písmen. U dětí, které jsou na to citlivé, proto dbáme na to, aby uvolnily zádové svaly (příznak stresu) a nebály se zapisovat, co slyšeli, ne to, co právě poslouchájí. To, co právě poslouchají za ně automaticky analyzuje plazí mozek (někde v pravém spánkovém laloku - za pravým uchem), oni pak jen savčím mozkem zapisují, co slyšeli (frontální lalok za čelem posílá impulzy k Rolandově rýze, kde se vysílají impulzy ke svalům). 
+
+Je důležité vědět, že ve stresu přestává fungovat paměť, tedy děti vedeme k tomu, aby nebyly ve stresu. Ty, které upadají do velkého stresu z časového skluzu raději naučíme písmena v tak pomalém tempu, aby se v klidu správně rozpomněly na 90 % písmen. Nevadí, když se při pomalém tempu mají mikropauzy, v této "nudné mezidobě" totiž vzniká žádoucí reflexní spojení zvuk-pohyb prstu. Tedy jako u klavíru platí, čím pomaleji hraji, tím rychleji se učím. Je to jako s rozbruskou - čím méně tlačím na tenký řezný kotouč, tím rychleji řeže. Čím méně se snažím zvládnout partnerský rozchod silou vůle, tím dříve ho mám za sebou. Čím méně se snažím usnout, tím snadněji usnu. To vše jsou příklady paradoxů, které často lidem nedocházejí. Síla vůle není vždy optimální nástroj na řešení problému.
+
+Tedy u Kochovy metody volíme --rychlost=120, aby písmena tvořila jednolitý akustický celek, zvýšíme prodlevu mezi písmeny --mezi-pismeny=400 (nyní výchozí hodnoty). Tuto prodlevu nastavujeme tak, abychom jednak nebyli v časovém stresu, ale také abychom nepoužívali senzorický registr. Dalším důležitým parametrem je počet písmen na vysílanou skupinu. Doporučuji pro začátečníky 5, aby si mohli po skupince písmen odpočinout a zrelaxovat (to je výchozí nastavení u parametru cviceni## a postupne##). Jinak u Kochovy metody jsem nastavil 7 znaků právě s ohledem na Kochův požadavek 90% úspěšnosti. Jestliže totiž máme 7 písmen s pravděpodobností správné odpovědi 0,9, pak 0,9^7=0,48 čili přibližně 50 % pravděpodobnost, že uhodnete celou skupinku. Jakmile tedy vidíte, že skupinky po 7 písmenech určujete většinou správně, je načase přidat další písmeno. 
+
+Postup při učení Kochovou metodou
+
+jkmorseovka.sh --cviceni koch1 
+jkmorseovka.sh --cviceni koch1 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10  #ručně nastavené parametry  
+
+Když vidíte, že většinou skupiny 7 písmen hádáte správně, tak přidáte písmeno:
+jkmorseovka.sh --cviceni koch2
+Tak postupujete az do koch40
+
+Pokud si ve skriptu nastavíte vlastní pořadí písmen (proměnná abeceda_postupne), pak můžete stejně nacvičovat vlastní cvičení:
+jkmorseovka.sh --cviceni postupne2 
+A tak dále až do postupne40
 
 
-U Kochova přístupu bývá problém právě časový stres, které působí časový skluz při zápisu písmen. U dětí, které jsou na to citlivé, proto dbáme na to, aby uvolnily zádové svaly (příznak stresu) a nebály se zapisovat, co slyšeli, ne to, co právě poslouchájí. To, co právě poslouchají za ně automaticky analyzuje plazí mozek (někde v pravém spánkovém laloku - za pravým uchem), oni pak jen savčím mozkem zapisují, co slyšeli (frontální lalok za čelem posílá impulzy k Rolandově rýze, kde se vysílají impulzy ke svalům). 
 
-Je důležité vědět, že ve stresu přestává fungovat paměť, tedy děti vedeme k tomu, aby nebyly ve stresu. Ty, které upadají do velkého stresu z časového skluzu raději naučíme písmena v tak pomalém tempu, aby se v klidu správně rozpomněly na 80-90 % písmen. Nevadí, když se při pomalém tempu trochu nudí, v této "nudné mezidobě" totiž vzniká žádoucí reflexní spojení zvuk-pohyb prstu. Tedy jako u klavíru platí, čím pomaleji hraji, tím rychleji se učím. Je to jako s rozbruskou - čím méně tlačím na tenký řezný kotouč, tím rychleji řeže. Čím méně se snažím zvládnout partnerský rozchod silou vůle, tím dříve ho mám za sebou. Čím méně se snažím usnout, tím snadněji usnu. To vše jsou příklady paradoxů, které často lidem nedocházejí.
 
 Neuropsychologické vysvětlení časového skluzu
 
