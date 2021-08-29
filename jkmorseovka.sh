@@ -283,12 +283,12 @@ function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
 		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
 # 		Gvyber=$(sed -r "s/^(.{$koch_pocet}).*$/\1/" <<<$abeceda_koch)
 		Gvyber=$(head -c $koch_pocet <<<$abeceda_koch) # head je jednodussi nez sed
-		[ ! $xFlag ]&&Gpocet_pismen_cviceni=6 # nahodile cviceni jede po 10 pismenech, nejlepsi pro Kocha
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=7 # nahodile cviceni jede po 7 pismenech, nejlepsi pro Kocha 
 # 		echo koch Gtext $Gtext 		Gvyber $Gvyber
 	elif   [[ "$Gtext" =~ ^postupne[0-9]+$ ]]; 	then 
 		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
 		Gvyber=$(head -c $koch_pocet <<<$abeceda_postupne) # head je jednodussi nez sed
-		[ ! $xFlag ]&&Gpocet_pismen_cviceni=6 # nahodile cviceni jede po 5 pismenech, nejlepsi pro Kocha
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=5 # 
  	elif [ "$Gtext" == "cviceni1"  ]; 	then Gvyber="te"
 	elif [ "$Gtext" == "cviceni2"  ]; 	then Gvyber="mnai"
 	elif [ "$Gtext" == "cviceni12" ]; 	then Gvyber="temnai"
