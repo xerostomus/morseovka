@@ -773,20 +773,22 @@ function Fprocvicovani { # $1 textlatinkou
 	s=0 # pocet opsanych pismen
 	start=$(date "+%s") # start programu
 	while true; do # [ "$REPLY" == "y" ];do
+		[ $i -eq 1 ] && echo -n "$(date +%Y-%m-%d_%H-%M-%S) "  >> jkmorseovka$(date +%Y-%m-%d).log
 		morse=$(Flatinka_do_morse $latinka)
 # 		echo "morse($morse) latinka($latinka)"
 		Fmorseovka_hrani "$morse" &> /dev/null
 # 		read -n $Gpocet_pismen_cviceni  -e -i "$odpoved"  -p "Co slyšíte? " odpoved
 		read -n $Gpocet_pismen_cviceni  -e  -p "Co slyšíte? " odpoved # je lepsi, kdyz celou skupinu opise znova
 		if [[ "$odpoved" =~ .*\;.* ]];then break
-		elif [ "$odpoved" == cteni ]; then Fcteni_znaku;
+# 		elif [ "$odpoved" == cteni ]; then Fcteni_znaku;
 # 		elif [ "$odpoved" == "?" ]; then 
 # 			echo Mělo by to být: $latinka;
 		elif [ "$odpoved" == "$latinka" ];then	
 			sekund=$(( $(date "+%s") - $start ))
 			s=$(( Gpocet_pismen_cviceni + s )) # celkem pismen
 			echo -e "\tSprávně na $i. pokus. Zadání: $latinka $morse	Rychlost: $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" 
-			echo "$(date +%Y-%m-%d_%H-%M-%S) $latinka $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
+# 			$latinka $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
+			echo "($latinka) $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
 			Fcviceni # vytvori novy nahodily retezec v Gcviceni_text
 			latinka=$Gcviceni_text
 			i=0
@@ -795,6 +797,7 @@ function Fprocvicovani { # $1 textlatinkou
 			odpoved=""
 		else #if [ "$odpoved" != "$latinka" ];then 
 			echo -e "\tŠpatně ($i)."
+			echo -n "$odpoved " >> jkmorseovka$(date +%Y-%m-%d).log
 		fi
 		((i++))
 	done 
