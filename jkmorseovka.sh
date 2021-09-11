@@ -219,7 +219,7 @@ $nazev_programu --vypis_znaku # Seznamte se s mnemotechnickými akrostichy znak�
 --pismena-vizualne - je nejlepší pro úplné začátečníky - učí jednotlivá písmena a vypisuje je i na obrazovku
 $nazev_programu --pismena-vizualne cviceni1 # testuje jednoznaková písmena , tzn. e, t, a zobrazuje je
 $nazev_programu -P cviceni12 # testuje jedno- a dvouznaková písmena, tzn. etimna, a zobrazuje je
-	Po třech chybách se objeví správná odpověď. 
+	Po třech chybách se objeví správná odpověď.
 	Velké volní úsilí nemá smysl, protože drilujeme plazí mozek a ne racionální, savčí.
 
 --pismena - procvičuje jednotlivá písmena, ale bez zrakové opory. Začínáme po zvládnutí předchozích. 
@@ -232,6 +232,7 @@ $nazev_programu -o cviceni1234 # vytvoří nahodilou kombinaci z běžných pís
 
 --cviceni - příjem skupin nahodile vybraných písmen z daného cvičení
 $nazev_programu --cviceni bflmpsvz # procvičuje obojetné souhlasky
+$nazev_programu --cviceni vaseznky # procvičuje vaše znaky
 $nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvičuje po třech čtyřznaková písmena, ale dělá mezi nimi velké pauzy
 $nazev_programu --cviceni koch5 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10 # ručně nastavené parametry u Kochovy metody (začínáme koch1 a pokračujeme postupně až do koch40)
 Uvnitř skriptu si můžete nastavit proměnnou abeceda_postupne, kde si nastavíte vlastní pořadí písmen.
@@ -338,6 +339,18 @@ function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
 		Gcviceni_text=$Gvyber
 	fi
 	}
+function Ftecka_vizualne {
+	echo -ne "       ████████████████████████████████    \r"
+	sleep $tecka_trvani
+	echo -ne "                                           \r"
+	sleep $pauza_tecka_carka
+	}
+function Fcarka_vizualne {
+	echo -ne "       ████████████████████████████████    \r"
+	sleep $carka_trvani
+	echo -ne "                                           \r"
+	sleep $pauza_tecka_carka
+	}	
 function Ftecka { # kdyz je   $1 ":" pak to potlaci vystup
 	$1 echo -n "."
 # 	play -n synth $tecka_trvani sine $nota &> /dev/null
@@ -989,6 +1002,19 @@ fi
 
 Fcviceni # nastavi promennou Gvyber Gcviceni_text
 Fnastaveni_rychlosti $Grychlost
+
+if false; then 
+	Ftecka_vizualne
+	Fcarka_vizualne
+	Fcarka_vizualne
+	Ftecka_vizualne
+	sleep $pauza_pismeno
+	Ftecka_vizualne
+	Fcarka_vizualne
+	sleep $pauza_pismeno
+	exit
+fi 
+
 
 if $hFlag; then 
 	Fusage
