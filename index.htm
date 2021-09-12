@@ -1,0 +1,126 @@
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+<meta http-equiv="Content-Language" content="cs" />
+<title>Program na výuku morseovky</title>
+
+<style>
+<!--
+body    { margin-left:3%; margin-right:3% }
+p       {ffont-size:200%; text-align: justify;  margin-bottom: 5; margin-top:0; line-height: 200% }
+.vo     {text-indent: 1cm; text-align: justify }
+.to     {text-indent: 1cm; text-align: justify; font-weight: bold }
+.prg     {text-indent: 2cm; text-align: left; ffont-weight: bold ; font-family: mono}
+.vvp    {text-indent: 0; text-align: Right; }
+.tvp    {text-indent: 0; text-align: Right; font-weight: bold }
+.vvl    {text-indent: 0; text-align: Left; }
+.tvl    {text-indent: 0;text-align: Left; font-weight: bold }
+.vs     {text-indent: 0;  text-align: center; }
+.ts     {text-indent: 0; text-align: center;  font-weight: bold }
+.t      {text-indent: 0; font-size: 16; font-weight: bold; font-family: "Arial", sans-serif; }
+.mt     {text-indent: 0;font-size: 16pt; font-weight: bold; margin-bottom:0; font-family: "Arial", sans-serif; }
+.se     {text-indent: -5%; padding-left: 10%;  line-height: 150%; margin-left: 15; text-align: justify;margin-bottom: 5; margin-top:0;}
+.r1     {text-indent: 0; margin-bottom: 0; margin-top:0;line-height: 100% }
+.r12    {text-indent:  2cm; margin-bottom: 0; margin-top:0;line-height: 100% }
+.l      {margin-bottom: 0cm; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none;font-family: "Arial", sans-serif; ; line-height: 150% }
+.pr     {margin-left: 0.52cm; text-indent: 0cm; margin-bottom: 0cm; font-family: "Arial", sans-serif; line-height: 150% }
+table, th, td, tr {  border: 1px solid black;  border-collapse: collapse; valign: center}
+h1   { font-size: 24pt; font-weight: bold; text-align:center; font-family: "Arial", sans-serif; }
+h2   { text-align: center; font-size: 16pt; font-weight: bold; font-family: "Arial", sans-serif; }
+h3   { font-size: 14pt; font-weight: bold; margin-bottom:0; font-family: "Arial", sans-serif; }
+h4   { font-size: 24pt; font-weight: bold; text-align:center;font-family: "Arial", sans-serif;  }
+h5   { text-align: center; font-size: 16pt; font-weight: bold;font-family: "Arial", sans-serif;  }
+h6   { font-size: 14pt; font-weight: bold; margin-bottom:0;font-family: "Arial", sans-serif;  }
+.iniciala::first-letter { initial-letter: 2; }
+-->
+</style>
+<base href="." target="_blank" />
+</head>
+<body>
+<h1><b>Program na výuku morseovky</b></h1>
+<p class="vs">PhDr. Mgr. Jeroným Klimeš, Ph.D. 2021-08-17</p>
+<p class="vs">jeronym.klimes@seznam.cz</p>
+<p class="vs">www.klimes.us</p>
+<p class="mt"><b>Příběh na začátku</b></p>
+<p class="vo">Tento program vznikl zcela neplánovaně. Byl u nás na návštěvě syn ženiny kamarádky a nějak z něho vylezlo, že se učí morseovku. Řekl jsem si, že to nemůže být nic složitého, a že by si to mohli kluci zkusit naprogramovat v Bash - Linux. Ukázalo se, že to je mnohem složitější počin, než se prve zdálo. Už teď má ten program přes 1000 řádek.</p>
+<p class="vo">Samozřejmě kdybych se rozhodoval napsat ten program od začátku, tak bych asi raději sáhl po Pythonu, nebo C, protože psát to v Bash je trochu zhůvěřilost. Ale když už to mám takto napsané, tak to předělávat nebudu. Bash je šílená zmatlanina historických reliktů, nedodělků a provizorních řešení, takže v něm programovat je trochu alchymie, ale má to své výhody - běží na každém počítači s Linuxem (Ubuntu, Kde, Mint ap.), nevyžaduje žádné mimořádné knihovny či speciální programy než ty, které lze stáhnout z běžných úložišť (sudo apt install ***). Z toho důvodu si může každý tento program upravit k obrazu svému, přenastavit si konstanty, vytvořit si vlastní cvičení ap.</p>
+<p class="vo">Co se ale tak nějak samo podařilo bylo naprogramování jádra programu, který generuje samotné zvuky. Nakonec to neskládám z teček a čárek, ale napřed vytvořím jakýsi "skript" z parametrů a pomocí něho programem sox vytvořím zvukový soubor. Ten se pak přehrává, takže zvuk je hezky vyhlazený, pravidelný, jako by ho sázel profesionální radista. To je myslím největší přednost tohoto programu. Jedná se jmenovitě o proceduru Fmorseovka_hrani - vstup je morse kod (-..-), výstup zvukový soubor (.ogg).</p>
+<p class="mt"><b>Vlastní výuka Morseovy abecedy</b></p>
+<p class="vo">Vlastní výuka je zároveň seznámení dětí s terminálem Linuxu a s příkazovou řádkou.</p>
+<p class="vo">Program si stáhneme z GitHub úložiště jako dva soubory - shell script a obrázek znaků:</p>
+<p class="prg"><b>jkmorseovka.sh</b></p>
+<p class="prg"><b>jkmorseovka.png</b></p>
+<p class="vo">Tento vysvětlovací soubor, popř. další nejsou nutné pro běh programu.</p>
+<p class="vo"></p>
+<p class="vo">Napřed musíme nastavit spustitelnost scriptu:</p>
+<p class="prg"><b>chmod +x jkmorseovka.sh</b></p>
+<p class="vo">Načež ho můžeme spustit a vyzkoušet, co z něj vypadne, tak vyzkoušíme podle toho, co bude fungovat:</p>
+<p class="prg"><b>./jkmorseovka.sh </b># nebo</p>
+<p class="prg"><b>jkmorseovka.sh</b></p>
+<p class="vo">Program si napřed vyžádá instalaci pomocných programů: sox (výroba zvuků), bc (kalkulačka), feh (zobrazování obrázku). Dále napoví, že vyžaduje nějaké parametry:</p>
+<p class="prg"><b>jkmorseovka.sh --help</b></p>
+<p class="vo">Nápověda se ukončuje písmenem q - quit a je v ní napsán celý postup, jak se morseovku učíme.</p>
+<p class="prg"><b>jkmorseovka.sh --vypis-znaku</b></p>
+<p class="vo">Napřed se zcela povrchně seznámíme s mnemotechnickými frázemi, které napovídají morse znak, např. Kákorá -.-. Po ukončení nápovědy se zobrazí obrázek s tabulkou, která se čte vždy od shora dolu s tím, že černý proužek je čárka, bílý tečka. Takže když sestupujeme odshora k písmenu K podél šipky, tak máme černá - bílá - černá, čili "-.-".</p>
+<p class="vo"><a href="jkmorseovka_navod.png"><img src="jkmorseovka_navod.png" width="40%" border="0" /></a></p>
+<p class="vo">Druhým krokem se nácvik po písmenech:</p>
+<p class="prg"><b>jkmorseovka.sh --pismena-vizualne cviceni1</b></p>
+<p class="vo">Cviceni1 jsou jednoznakova pismene, čili E a T, která se vizuálně zobrazují, když se přehrávájí. To je dobré pro začátek, ale pak přecházíme na cvičení bez zrakové opory:</p>
+<p class="prg"><b>jkmorseovka.sh --pismena cviceni12</b></p>
+<p class="vo">Toto cvičí jedno a dvou znaková písmena už jen sluchem, každopádně po třech chybách se objeví nápověda.</p>
+<p class="mt"><b>Exkurz: Savčí versus plazí mozek u morseovky a Kochova metoda</b></p>
+<p class="vo">Začátečníky překvapuje informace, že vůbec není důležité, jestli si pamatují či nepamatují jednotlivé znaky, takže si mohou kdykoli říkat o nápovědu bez většího volního úsilí. Totiž učení morseovky není test inteligence či paměti. Tam necvičíme racionální savčí mozek či sílu vůle, ale je to drilování plazího mozku, aby se vytvořilo reflexní spojení mezi zvukem -.- a okamžitým stiskem klávesy K. Než toto reflexní spojení samo vznikne, musí se ten úkon zopakovat tisíckrát po dobu několika měsíců. Takže je jasné, že mezi tím byste se naučili racionálním savčím mozkem mnemotechnické zkratky stokrát, proto nás opravdu netrápí, že je na začátku dítě pořádně neumí.</p>
+<p class="vo">Důsledek tohoto faktu je, že se hlava neučí analyticky rozebrat zvuk na dílčí čárky, tečky, ale měla by ho vnímat jako jeden celek, jako jedno slovo. Slovo prak taky v běžné řeči nerozkládáme na písmena - P-R-A-K. Stejně tak morse kódy se učíme jako celky, ne jako složeninu teček a čárek. Jakmile tedy hlava začne rozebírat: "Táty táta čili děda je písmeno Y, které je zrcadlově obrácené k písmenu Q, které zní jako nápěv z písně 'Saxano, v knihách vázaných v kůži'." Tak je přínak toho, že to analyzujeme savčím mozkem a ne plazím. To je dobré maximálně na zapamatování morse kódů, ale rozhodně ne na učení se morseovky pro vysílání a příjem textu. Naopak cílem je, aby na -.-- reagovala jen samotná "ruka" (tedy jen plazí mozek) stiskem klávesy Y a hlava nic jiného neanalyzovala.</p>
+<p class="vo">Z tohoto důvodu je dobré, aby znaky byly hrány rychle a mezi ně, abychom raději vkládali delší pauzy, než abychom zpomalovali vlastní přehrávání morse kódu, to právě zapíná analytický savší mozek. U cvičení tedy prakticky vždy nastavujeme větší pauzu mezi písmeny, než je normovaná (1000 místo 100), ale by nevznikal časový stres. To je podstata tzv. Farnsworthovy komprese.</p>
+<p class="prg"><b>jkmorseovka.sh -o cviceni3a --mezi-pismeny 1000 --pocet-pismen 3</b></p>
+<p class="vo">Rychlost samozřejmě můžeme také zpomalit parametrem "--rychlost 50", ale jak říkám není to doporučená praxe.</p>
+<p class="vo">V nevýhodě jsou děti s ADHD, které při morseovce trápí zárazy - mnohem hůř vytvářejí stabilní reflexní spojení:</p>
+<p class="vs">Zvuk → Pohyb prstu</p>
+<p class="vo">Díky tomu mohou být později kreativnější a vynalézavější. Bohužel podmínkou nutnou kreativity je naučit se, přesněji řečeno nadrilovat se předem základy řemesla, což je pro ADHD děti utrpením. Ale holt takový je život. Nic není zadarmo.</p>
+<p class="mt"><b>Kochova metoda a časový skluz</b></p>
+<p class="vo">O toto vypínání savčího mozku se snaží metoda, kterou Ludwig Koch vymyslel před válkou (1930) a která učí morseovku podobně, jako se děti téměř plné rychlosti učí rodný jazyk: "Pocem!" a ne "Pojď sem!". Napřed se v plné rychlosti učíme dvě písmena KM a pak pomalu přidáváme další, když chybovost poklesne pod 10&nbsp;%, tzn. když už je vcelku vytvořené reflexní spojení. Kochův přístup vede k tomu, že od začátku se učíme poslouchat jedno písmeno a zároveň psát předposlední jaksi ve skluzu. Například máme-li text BFL. Když posloucháme B, nic nepíšeme. Když už poslouchápme písmeno F, tak píšeme předchozí B. Když posloucháme L, píšeme rozeznané F. Když skončilo vysílání, dopíšeme poslední L.</p>
+<p class="vo">Osobně se domnívám, že pro lidi, kteří se chtějí jen naučit morseovu abecedu, trochu ji provičit, aby ji jen tak nezapomněli, ale dál se nechtějí améterskému radiu věnovat, tak stačí se naučit jen jednotlivá písmena pomocí parametru --pismena, popř. --pismena-vizualne. Prostě kdo analyzuje jen napsanou morseovku na papíře (telegraf, táborové hry), nemusí se učit psát písmena s latencí oproti poslouchanému zvuku. Pokud ale chtějí chytat 10 slov za minutu, tak musejí přejít na Kochovu metodu. Ovšem ta vyžaduje mnohem větší dril a delší učení, než pouhé naučení a procvičení písmen. Velice hezká stránka, která mě inspirovala, je tato: <a href="https://stendec.io/morse/koch.html" target="_blank">https://stendec.io/morse/koch.html</a>.</p>
+<p class="vo">Hlavní přednost Kochovy metody je, že odnaučí člověka využívat tzv. senzorický registr. Například, když slyšíte -.-, a nenaskočí vám automaticky písmeno K, tak si ten zvuk začnete přehrávat z tzv. senzorického registru, ve kterém jsou přibližně poslední dvě sekundy vnímaného zvuku či obrazu. Začnete si opakovat "-.- -.- -.-, čárka tečka čárka, co by to mohlo být?". Jenže to máte zapnutý jak senzorický registr, tak i racionální mozek a to je ke škodě. Když ale Kochova technika vás tlačí dopředu, naučíte se tento senzorický registr nevyužívat, ale to znamená, že se musí mnohem více zautomatizovat spojení 'slyšený kód → pismeno'.</p>
+<p class="vo">Odvrácenou stranou Kochova přístupu bývá naopak časový stres, které působí časový skluz při zápisu písmen. U dětí, které jsou na to citlivé, proto dbáme na to, aby uvolnily zádové svaly (příznak stresu) a nebály se zapisovat, co slyšely, ne to, co právě poslouchají. To, co právě poslouchají, za ně automaticky analyzuje plazí mozek (někde v pravém spánkovém laloku - za pravým uchem), oni pak jen savčím mozkem zapisují, co slyšeli (frontální lalok za čelem posílá impulzy k Rolandově rýze, kde se vysílají impulzy ke svalům).</p>
+<p class="vo">Je důležité vědět, že ve stresu přestává fungovat paměť, tedy děti vedeme k tomu, aby nebyly ve stresu. Ty, které upadají do velkého stresu z časového skluzu raději naučíme písmena v tak pomalém tempu, aby se v klidu správně rozpomněly na 90 % písmen. Nevadí, když se při pomalém tempu mají mikropauzy, v této "nudné mezidobě" totiž vzniká žádoucí reflexní spojení zvuk-pohyb prstu. Tedy jako u klavíru platí, čím pomaleji hraji, tím rychleji se učím. Je to jako s rozbruskou - čím méně tlačím na tenký řezný kotouč, tím rychleji řeže. Čím méně se snažím zvládnout partnerský rozchod silou vůle, tím dříve ho mám za sebou. Čím méně se snažím usnout, tím snadněji usnu. To vše jsou příklady paradoxů, které často lidem nedocházejí. Síla vůle není vždy optimální nástroj na řešení problému.</p>
+<p class="vo">Tedy u Kochovy metody volíme --rychlost=120, aby písmena tvořila jednolitý akustický celek, zvýšíme prodlevu mezi písmeny --mezi-pismeny=400 (nyní výchozí hodnoty). Tuto prodlevu nastavujeme tak, abychom jednak nebyli v časovém stresu, ale také abychom nepoužívali senzorický registr. Dalším důležitým parametrem je počet písmen na vysílanou skupinu. Doporučuji pro začátečníky 5, aby si mohli po skupince písmen odpočinout a zrelaxovat. Jinak u Kochovy metody (koch#, postupne#, nahodne#) jsem nastavil 7 znaků právě s ohledem na Kochův požadavek 90% úspěšnosti. Jestliže totiž máme 7 písmen s pravděpodobností správné odpovědi 0,9, pak 0,9^7=0,48 čili přibližně 50 % pravděpodobnost, že uhodnete celou skupinku. Jakmile tedy vidíte, že skupinky po 7 písmenech určujete většinou správně, je načase přidat další písmeno.</p>
+<p class="vo">Momentálně jsou v programu tři varianty, které vycházejí z Kochovy metody:</p>
+<p class="prg"><b>jkmorseovka.sh --cviceni koch2</b></p>
+<p class="prg"><b>jkmorseovka.sh --cviceni postupne2</b></p>
+<p class="prg"><b>jkmorseovka.sh --cviceni nahodne2</b></p>
+<p class="vo">Všechny jsou nastaveny tak, že po pěti úspěšných, resp. neúspěšných pokusech přidají, resp. uberou znak.</p>
+<p class="vo">Mnou preferovana varianta je:</p>
+<p class="prg"><b>jkmorseovka.sh --cviceni nahodne2</b></p>
+<p class="vo">a to proto, že každý den začínám novou nahodilou sekvencí písmen a každý den začínám od nějaké dvojice, kterou se naučím distriminovat čili rozlišovat zcela reflexně. Když písmena znám a jdou mi dobře, tak program sám rychle zvyšuje počet písmen. Další den pak začínám s novými písmeny. To je výhoda počítače, který nahodilé pořadí vytvoří lusknutím prstu. Proto myslím, že tuto variantu Koch před válkou neuvažoval. T.č. je tato sekvence bez číslovek, pokud ale chcete jako Koch zahrnout i čísla, pak si upravte v programu proceduru Fnahodne (viz komentovaná řádka u příkazu shuf).</p>
+<p class="mt"><b>Postup při učení Kochovou metodou</b></p>
+<p class="prg"><b>jkmorseovka.sh --cviceni koch2</b></p>
+<p class="prg"><b>jkmorseovka.sh --cviceni koch2 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10</b> #ručně nastavené parametry</p>
+<p class="vo">Když vidíte, že většinou skupiny 7 písmen hádáte správně, tak přidáte písmeno:</p>
+<p class="prg"><b>jkmorseovka.sh --cviceni koch3</b></p>
+<p class="vo">Tak postupujete až do koch40, každopádně program tak činí sám po pěti po sobě jdoucích správných skupinách.</p>
+<p class="vo">Pokud si ve skriptu nastavíte vlastní pořadí písmen (proměnná abeceda_postupne), pak můžete stejně nacvičovat vlastní cvičení:</p>
+<p class="prg"><b>jkmorseovka.sh --cviceni postupne2</b></p>
+<p class="vo">A tak dále až do postupne40.</p>
+<p class="mt"><b>Neuropsychologické vysvětlení časového skluzu</b></p>
+<p class="vo">Červeně je to, co se zjednodušeně označuje za plazí mozek, protože to měli již dinosauři čili i slepice. Zelené je savčí racionální mozek, vlastnost vcelku jen člověka. Na zpracování morseovky se můžeme podívat dvojmo, proto dva obrázky:</p>
+<p class="to"><b>A) Co se postupně děje se zpracovávaným písmenem.</b></p>
+<p class="vo"><a href="recova_centra_postupne.png"><img src="recova_centra_postupne.png" width="40%" aalign="left" border="0" /></a></p>
+<p class="vo">Ze sluchových center ve spánkovém laloku jde do pravé poloviny mozku, kde je Wernickeho centrum, které slyšené -.- převede na písmeno K a pošle ho do savčího mozku. Tam ho Brockovo centrum převede na povel do prstu a pošle do motorické oblasti k Rolandově rýze. To se ale děje postupně a tak pomalu, jak pomalý je náš mozek.</p>
+<p class="to"><b>B) Co se v mozku děje v danou chvíli.</b></p>
+<p class="vo"><a href="recova_centra_soucasne.png"><img src="recova_centra_soucasne.png" width="40%" aalign="left" border="0" /></a></p>
+<p class="vo">Zpracování písmen ale jde trochu urychlit tím, že plazí mozek bude zpracovávat nové písmeno, zatímco savčí mozek bude vydávat povel k napsání předchozího písmena. Takže v jedné chvíli jsou na dvou místech v mozku dvě různá písmena. První S zpracovává čelní lalok (zelený savčí), druhé K analyzuje červený plazí. Při tom všem je ale důležité nepřecházet do časové stresu, tzn. nezapínat jiná centra pro stres, zejména hypotalamus.</p>
+<p class="vo">Na okraj poznamenávám, že nejsem neurovědec, takže ten proces bude určitě ještě o dost složitější. Proto není divu, že neurovědy patří na amerických universitách k velmi populárním.</p>
+<p class="mt"><b>Další dostupné procedury</b></p>
+<p class="vo">Zpět ale k morseovce. Určování písmen střídáme nejprve s opisováním:</p>
+<p class="prg"><b>jkmorseovka.sh --opis "Pepa Smolik" </b># vyžaduje přesný opis tohoto textu v morse kódech</p>
+<p class="prg"><b>jkmorseovka.sh --opis postupne11 </b># generuje náhodnou skupin z prvních 11 písmen.</p>
+<p class="vo"></p>
+<p class="vo">Víceméně jen pro logickou úplnost přikládám další procedury:</p>
+<p class="prg"><b>jkmorseovka.sh --diktat </b># diktujete v morse kodech a program vrací zvuk a zápis v latince</p>
+<p class="prg"><b>jkmorseovka.sh --morse "Na ja" </b># vytvoří a zahraje morse sekvenci: |-.|.-||.---|.-|</p>
+<p class="prg"><b>jkmorseovka.sh --latinka "|--|.-|--|.-|" </b># převádí morse znaky do latinky, čili vypíše a přehraje "mama".</b></p>
+<p class="mt"><b>Další úkoly do budoucna</b></p>
+<p class="vo">Při psaní toho programu jsem pamatoval na skauty v koncentračních táborech, kteří dokázali komunikovat pomocí morse po celé budově tím, že ji tiše vyklepávali na ústřední topení. To ovšem znamená přijímat text v běžném jazyce (ne šifrované skupinky po pěti písmenech). Přijímat jednotlivá písmena ve skupinách po celých slovech a k tomu odhadovat, co dané slovo bez diakritiky vlastně může znamenat představuje mnohem větší zátěž procesní kapacity, takže předpokládám, že bude třeba snížit tempo a zvětšit pauzy mezi slovy. Ale nyní jen předesílám, že proceduru na zpracování textu v přirozeném jazyce jsem zatím nenapsal.</p>
+<p class="vo"></p>
+<p><abbr title='Ceterum autem censeo Unionem Europaeam esse delendam'><img src='http://klimes.mysteria.cz/zpravodaj/logo_jk.php' /></abbr></p>
+</body>
+</html>

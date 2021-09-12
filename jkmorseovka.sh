@@ -1,8 +1,8 @@
 #!/bin/bash
  
 # TODO vypisy obrazovek: nohup jkmorseovka.sh -h | tee vystup.out
-# TODO dat vystup do prikazu column
-# TODO pismena neopakuji do omrzeni spatne pismeno
+# TODO 
+# TODO 
 # TODO 
 
 adresar=/dev/shm
@@ -21,12 +21,13 @@ debug=":" #nebo " "
 Grychlost=150 # 150 strední - vychozi
 Gmezi_znaky=100 # 100 strední/normovana
 Gmezi_znaky=400 # nejlepsi pro Kocha
-
+Gkoch_pocet=2 # pocet pismen u kochovo metod (koch, nahodile, postupne)
 # globalni promenne krome logickych promennych
 # 	Gtext - zadani z prikazove radky, napr cviceni123
 # 	Gvyber - z jakych pismen se vybira, "bflmpsvz"
 # 	Gcviceni_text - nahodile preskupene Gvyber
 # 	Gpocet_pismen_cviceni
+# 	Gkoch_pocet - pocet pismen u kochovo metod
 # 	ostatni promenne obvykle povazuji za lokalni
 
 #defaultni nastaveni
@@ -52,14 +53,15 @@ nazev_obrazku="$(basename -s sh $0 )png"
 adresar_programu=$(dirname $(whereis "$nazev_programu" | cut -f2 -d' ' ))
 pracovni_adresar=$(pwd)
 cesta_obrazek=$adresar_programu/$nazev_obrazku
+nazev_nahodile=$adresar/jkmorseovka_nahodile_$(date +%Y-%m-%d).tmp
 
 # echo $nazev_programu $nazev_obrazku $adresar_programu $pracovni_adresar $cesta_obrazek
 # exit
 
 function Fvypis_znaku {
+less <<mezirici
+Konec nápovědy - stisknětě písmeno q (quit)
 
-# column -t -s$'\t' <<mezirici
-column -t -s$'\t' <<mezirici
 PÍSMENO 	KÓD 	POMOCNÉ SLOVO
 A	/.-/	Akát
 B	/-.../	Blýskavice
@@ -88,10 +90,7 @@ W	/.--/	Vagón klád
 X	/-..-/	Xénokratés
 Y	/-.--/	Ý se krátí; Ýgar mává 
 Z	/--../	Známá žena
-mezirici
-read
 
-column -t -s$'	' <<mezirici
 ČÍSLICE 	KÓD 	ZKRÁCENÝ KÓD
 0	/-----/	/-/
 1	/.----/	/.-/
@@ -103,19 +102,13 @@ column -t -s$'	' <<mezirici
 7	/--.../	/-.../
 8	/---../	/-../
 9	/----./	/-./
-mezirici
-echo
 
-column -t -s$'	' <<mezirici
 PÍSMENO 	KÓD
 Ä	/.-.-/
 Ë	/..-../
 Ö	/---./
 Ü	/..--/
-mezirici
-read
 
-column -t -s$'	' <<mezirici
 SPECIÁLNÍ ZNAK 	NÁZEV 	KÓD
 ,	Čárka	/--..--/
 .	Tečka	/.-.-.-/
@@ -132,10 +125,7 @@ _	Podtržítko	/..--.-/
 )	Kulatá závorka zavírací	/-.--.-/
 <->	Tabulátor	/.----./
 @	Zavináč	/.--.-./
-mezirici
-read 
 
-column -t -s$'	' <<mezirici
 ZVLÁŠTNÍ SIGNÁL	KÓD
 Začátek vysílání	/-.-.-.-./
 Konec vysílání	/...-.-/
@@ -146,10 +136,22 @@ Pomaleji	/-.-.-../
 Omyl	/././././././
 Opakuji	/../../../../../../
 SOS, Pomoc	/.../---/.../
+
+Převzato z http://morseovaabeceda.cz/ a https://morsecode.world
+
+Konec nápovědy - stisknětě písmeno q (quit)
+
 mezirici
-echo
-echo "Převzato z http://morseovaabeceda.cz/ a https://morsecode.world"
 	}	
+function Fnahodile {
+	if [ ! -e $nazev_nahodile ]; then
+# 		https://linuxhint.com/bash_shuf_command/
+# 		shuf -e  a b c d e f g h ch i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 | tr -d $'\n'
+		shuf -e  a b c d e f g h i j k l m n o p q r s t u v w x y z | tr -d $'\n' > $nazev_nahodile
+	fi		
+	abeceda_nahodile=$(cat $nazev_nahodile)
+	Gkoch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+	}
 function Fnastaveni_rychlosti { #$1 Grychlost 50 - 150
 # 	Grychlost=$1
 	tecka_trvani=$(bc -l <<<"scale=3;10/$Grychlost") # je-li Grychlost 100, pak tecka cili unit trva 100ms, 
@@ -208,13 +210,13 @@ Použití:
 	Parametry v [] jsou volitelné. 
 	Krátké parametry s jednou pomlčkou (např. -p) jsou ekvivalentní dlouhým parametrům s dvěma pomlčkami (--pismena).
 
-$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|koch2 az koch40|postupne2 az postupne40|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345}
+$nazev_programu {-v|--vypis-znaku|-p|--pismena|-P|--pismena-vizualne|-c|--cviceni|-d|--diktat|-o|--opis|-m|--morse|-l|--latinka|-h|--help} [-r|--rychlost číslo 50 - 150] [-R|--mezi-pismeny číslo 10 - 1000] [-x|--pocet-pismen číslo 2-20 ]  {VasText|koch2 az koch40|postupne2 az postupne40|nahodile2 az nahodile30|cviceni1, podobně cviceni2,12,3,3a,3b,13,23,123,4,4a,4b,4c,4ab,4ac,4bc,14,24,34,1234,5,12345}
 
 Postup učení a vysvětlení jednotlivých znaků
 
 Povinné parametry
 --vypis-znaku - tabulky většiny písmen, znaků a signálů
-$nazev_programu --vypis_znaku # Seznamte se s mnemotechnickými akrostichy znaků a písmen, ale nemusíte se je učit zpaměti. To příjde samo.
+$nazev_programu --vypis-znaku # Seznamte se s mnemotechnickými akrostichy znaků a písmen, ale nemusíte se je učit zpaměti. To příjde samo.
 
 --pismena-vizualne - je nejlepší pro úplné začátečníky - učí jednotlivá písmena a vypisuje je i na obrazovku
 $nazev_programu --pismena-vizualne cviceni1 # testuje jednoznaková písmena , tzn. e, t, a zobrazuje je
@@ -234,10 +236,15 @@ $nazev_programu -o cviceni1234 # vytvoří nahodilou kombinaci z běžných pís
 $nazev_programu --cviceni bflmpsvz # procvičuje obojetné souhlasky
 $nazev_programu --cviceni vaseznky # procvičuje vaše znaky
 $nazev_programu --c cviceni4 --mezi-pismeny 1000 --pocet-pismen 3 # procvičuje po třech čtyřznaková písmena, ale dělá mezi nimi velké pauzy
-$nazev_programu --cviceni koch5 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10 # ručně nastavené parametry u Kochovy metody (začínáme koch1 a pokračujeme postupně až do koch40)
+$nazev_programu --cviceni koch5 --rychlost 130 --mezi-pismeny 500 --pocet-pismen 10 # ručně nastavené parametry u Kochovy metody (začínáme koch2 a pokračujeme postupně až do koch40)
 Uvnitř skriptu si můžete nastavit proměnnou abeceda_postupne, kde si nastavíte vlastní pořadí písmen.
 $nazev_programu --cviceni postupne3 # popř. další parametry jako u Kochovy metody.
-
+$nazev_programu --cviceni nahodile17 # každý den vygeneruje nahodilé pořadí znaků, které můžete procvičovat kochovo metodou
+	Dnešní nahodilé pořadí je: $abeceda_nahodile
+	Smazat dnešní nahodilé pořadí můžete změnit příkazem: 
+		rm $nazev_nahodile
+	Všechny Kochovy metody (koch#, postupne#, nahodile#) po pěti po sobě jdoucích úspěšných, resp. neúspěšných pokusech přidají, resp. uberou jedno písmeno. 
+	
 --diktat - vysílání vlastního textu
 $nazev_programu --diktat # nadiktujte si vlastní text morseovkou
 
@@ -248,9 +255,9 @@ $nazev_programu --rychlost 200 --morse "Salamista" # Převede latinkou psaný te
 $nazev_programu --latinka "/.../.-/--/.-// nebo |...-|---|-..|.-|"
 
 Volitelné parametry
---rychlost <číslo mezi 50 a 300> - počet písmen na cvičení (výchozí: 120)
---mezi-pismeny <číslo mezi 100 az 1000> - navýšení pauzy mezi písmeny (v: 100)
---znaku-cviceni <číslo mezi 2 a 20> - počet znaků ve cvičení (v: 2)
+--rychlost <číslo mezi 50 a 300> # počet písmen na cvičení (výchozí: 120)
+--mezi-pismeny <číslo mezi 100 a 1000> # navýšení pauzy mezi písmeny (v: 100)
+--znaku-cviceni <číslo mezi 2 a 20> # počet znaků ve cvičení (v: 2)
 Další parametry, např. hranou notu si nastavte uvnitř skriptu.
 
 Zvukový soubor právě hraného zvuku: $zvukovy_soubor
@@ -259,6 +266,14 @@ Známé chyby: Omezeně zpracovává písmeno CH a některé divné znaky. Angli
 
 $(Fvypis_konstant)
 
+Poznámka ke Kochově metodě
+  Kochova metoda začíná dvěma písmeny, které procvičuje v plné rychlosti. Když se chybovost dostane pod 10%, tak přidá další písmeno. Kochova sekvence je: "kmrsuaptlowi.njef0y,vg5/q9zh38b?427c1d6x"
+  Osobně si myslím, že je lepší každý den začínat jinou sekvencí, proto je zde je parametr nahodile2, který na každý den má novou nahodilou sekvenci písmen. Ve skritpu samém si můžete nastavit, jaké znaky má obsahovat (viz funkce Fnahodile). 
+  Více viz: https://stendec.io/morse/koch.html
+	Osobně nejvíce procvičuji příkaz: 
+$nazev_programu --cviceni nahodile2
+	u kterého sleduji, kolik až písmen ten den dokážu chytit. Doporučuji tuto metodu od začátku kombinovat s psaním všema deseti, tedy že první dvě písmena píšete od začátku správnými prsty. Tím zabijete dvě mouchy jednou ranou. Naučíte se Morseovu abecedu a zároveň psaní na stroji všemi deseti. 
+
 Autor, licence a hlášení chyb:
 	PhDr. Mgr. Jeroným Klimeš, Ph.D.
 	www.klimes.us
@@ -266,30 +281,32 @@ Autor, licence a hlášení chyb:
 	
 Konec nápovědy. Zmáčkněte klávesu q a zobrazí se obrázek.
 
-PS. https://stendec.io/morse/koch.html
-The Koch method is based on exposing the student to full-speed Morse from day one. The first lesson starts with just two characters, played in full speed. The student must "copy" them (i.e. writing them down or typing them, like in this page). Once 90% of the characters are correctly "copied", the student can go move to the next lesson, where just one more character is added. 
-Kochova sekvence je: "kmrsuaptlowi.njef0y,vg5/q9zh38b?427c1d6x"
-
 mezirici
-	feh  --zoom 200 --geometry $(feh  -l "$cesta_obrazek" | awk '(NR==2) {print(($3*2)"x"($4*2));}') "$cesta_obrazek" &
+	read -p "Chcete zobrazit tabulku s nápovědou? y/N "
+	[ "$REPLY" == "y" ]&&feh  --zoom 200 --geometry $(feh  -l "$cesta_obrazek" | awk '(NR==2) {print(($3*2)"x"($4*2));}') "$cesta_obrazek" &
+	echo
 	exit
-	
-var lesson_seq = "kmrsuaptlo" + "wi.njef0y," + "vg5/q9zh38" + "b?427c1d6x";
-	
 	}
-function Fcviceni { #nacita Gtext modifikuje Gvyber Gcviceni_text
+function Fcviceni { #nacita Gtext z prikazove radky, viz dole. Modifikuje Gvyber Gcviceni_text
 	Gcviceni_text=""
 	nasel=true
 	if   [[ "$Gtext" =~ ^koch[0-9]+$ ]]; 	then 
-		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
-# 		Gvyber=$(sed -r "s/^(.{$koch_pocet}).*$/\1/" <<<$abeceda_koch)
-		Gvyber=$(head -c $koch_pocet <<<$abeceda_koch) # head je jednodussi nez sed
+# 		Gkoch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+# 		Gvyber=$(sed -r "s/^(.{$Gkoch_pocet}).*$/\1/" <<<$abeceda_koch)
+		Gvyber=$(head -c $Gkoch_pocet <<<$abeceda_koch) # head je jednodussi nez sed
 		[ ! $xFlag ]&&Gpocet_pismen_cviceni=7 # nahodile cviceni jede po 7 pismenech, nejlepsi pro Kocha 
+		kFlag=true
 # 		echo koch Gtext $Gtext 		Gvyber $Gvyber
 	elif   [[ "$Gtext" =~ ^postupne[0-9]+$ ]]; 	then 
-		koch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
-		Gvyber=$(head -c $koch_pocet <<<$abeceda_postupne) # head je jednodussi nez sed
-		[ ! $xFlag ]&&Gpocet_pismen_cviceni=5 # 
+# 		Gkoch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+		Gvyber=$(head -c $Gkoch_pocet <<<$abeceda_postupne) # head je jednodussi nez sed
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=7 # 
+		kFlag=true
+	elif   [[ "$Gtext" =~ ^nahodile[0-9]+$ ]]; 	then 
+# 		Gkoch_pocet=$(sed 's/.*[^0-9]//g' <<<$Gtext)
+		Gvyber=$(head -c $Gkoch_pocet <<<$abeceda_nahodile) # head je jednodussi nez sed
+		[ ! $xFlag ]&&Gpocet_pismen_cviceni=7 # 
+		kFlag=true
  	elif [ "$Gtext" == "cviceni1"  ]; 	then Gvyber="te"
 	elif [ "$Gtext" == "cviceni2"  ]; 	then Gvyber="mnai"
 	elif [ "$Gtext" == "cviceni12" ]; 	then Gvyber="temnai"
@@ -782,8 +799,10 @@ function Fprocvicovani { # $1 textlatinkou
 	echo "[; konec]"
 	echo
 # 	REPLY="y"
+# 	pocet_spravnych_pokusu=0 # nedodelane - u kochovy metody po peti spravnych pokusu za sebou prida dalsi pismeno
+	za_sebou=10
 	i=1
-	s=0 # pocet opsanych pismen
+	spravne_pismen=0 # pocet opsanych pismen
 	start=$(date "+%s") # start programu
 	while true; do # [ "$REPLY" == "y" ];do
 		[ $i -eq 1 ] && echo -n "$(date +%Y-%m-%d_%H-%M-%S) "  >> jkmorseovka$(date +%Y-%m-%d).log
@@ -798,19 +817,47 @@ function Fprocvicovani { # $1 textlatinkou
 # 			echo Mělo by to být: $latinka;
 		elif [ "$odpoved" == "$latinka" ];then	
 			sekund=$(( $(date "+%s") - $start ))
-			s=$(( Gpocet_pismen_cviceni + s )) # celkem pismen
-			echo -e "\tSprávně na $i. pokus. Zadání: $latinka $morse	Rychlost: $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" 
-# 			$latinka $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
-			echo "($latinka) $i $s/$sekund=$(bc -l <<<"scale=3;60*$s/$sekund") zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
+			spravne_pismen=$(( Gpocet_pismen_cviceni + spravne_pismen )) # celkem pismen
+			echo -e "\tSprávně na $i. pokus. Zadání: $latinka $morse	Rychlost: $spravne_pismen/$sekund=$(bc -l <<<"scale=3;60*$spravne_pismen/$sekund") zn/min" 
+# 			$latinka $i $spravne_pismen/$sekund=$(bc -l <<<"scale=3;60*$spravne_pismen/$sekund")  zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
+			echo "($latinka) $i $spravne_pismen/$sekund=$(bc -l <<<"scale=3;60*$spravne_pismen/$sekund") zn/min" >> jkmorseovka$(date +%Y-%m-%d).log
 			Fcviceni # vytvori novy nahodily retezec v Gcviceni_text
 			latinka=$Gcviceni_text
 			i=0
 # 			read -N1 
 			if [ "$REPLY" == ";" ];then break; fi
 			odpoved=""
-		else #if [ "$odpoved" != "$latinka" ];then 
+			if $predchozi; then 
+				((za_sebou++))
+				if [ $za_sebou -gt 14 ] && [ $Gkoch_pocet -lt 40 ] && $kFlag; then # pet za sebou uspesnych skupin, jeste je volne Kochovo pismeno a zaroven delame kochovu techniku (koch, postupne, nahodile)
+					((Gkoch_pocet++)) 
+					Fcviceni
+					echo
+					echo "Přidali jsme další písmeno a procvičujeme $Gkoch_pocet písmen: $Gvyber"
+					echo "Přidali jsme další písmeno a procvičujeme $Gkoch_pocet písmen: $Gvyber" >> jkmorseovka$(date +%Y-%m-%d).log
+					za_sebou=10 # vynulujeme citac
+				fi
+			else
+				za_sebou=10 	# vynuluje citac, protoze me zajima jen pet za sebou jdoucich neuspechu ci úspechu
+				predchozi=true # zapamatuj si, ze predchozi byl neuspech 
+			fi
+		else # if [ "$odpoved" != "$latinka" ];then 
 			echo -e "\tŠpatně ($i)."
 			echo -n "$odpoved " >> jkmorseovka$(date +%Y-%m-%d).log
+			if $predchozi; then 
+				za_sebou=10 	# vynuluje citac, protoze me zajima jen pet za sebou jdoucich neuspechu ci úspechu
+				predchozi=false # zapamatuj si, ze predchozi byl neuspech 
+				else 
+				((za_sebou--))
+				if [ $za_sebou -lt 6 ] && [ $Gkoch_pocet -gt 2 ] && $kFlag; then # pet za sebou neuspesnych skupin, jeste je volne Kochovo pismeno a zaroven delame kochovu techniku (koch, postupne, nahodile)
+					((Gkoch_pocet--)) 
+					Fcviceni
+					echo
+					echo "Ubrali jsme jedno písmeno a procvičujeme $Gkoch_pocet písmen: $Gvyber"
+					echo "Ubrali jsme jedno písmeno a procvičujeme $Gkoch_pocet písmen: $Gvyber" >> jkmorseovka$(date +%Y-%m-%d).log
+					za_sebou=10 # vynulujeme citac
+				fi
+			fi
 		fi
 		((i++))
 	done 
@@ -835,7 +882,7 @@ function Fprocvicovani { # $1 textlatinkou
     rFlag=false  # rychlost
     sFlag=false  # statistika
     hFlag=false  # help/usage
-#     vypis_znaku=false # toto prednastaveni tam musi byt
+    kFlag=false  # Kochova metoda
     is_flag=false
 
 #	 getopts does not support long options. We convert them to short one. # not used here
@@ -999,6 +1046,7 @@ if ! $is_flag ; then
 	echo "$nazev_programu --help"
 	echo
 fi
+Fnahodile # kazdy den vygeneruje nahodilou sekvenci abecedy, ktera se ten den bude procvicovat kochovou metodou 
 
 Fcviceni # nastavi promennou Gvyber Gcviceni_text
 Fnastaveni_rychlosti $Grychlost
